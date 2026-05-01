@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>
+        EXPERIMENT 7: S3 → Lambda → DynamoDB
+Steps:
+1.	Open Amazon S3 → Create bucket (enable versioning) 
+2.	Open Amazon DynamoDB → Create table 
+o	Name: newtable 
+o	Partition key: unique 
+3.	Open AWS Lambda → Create function 
+o	Runtime: Python 
+o	Use existing role 
+4.	Add S3 trigger → select bucket → All object create events 
+5.	Replace Lambda code with: 
+import boto3
+from uuid import uuid4
+
+def lambda_handler(event, context):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('newtable')
+
+    for record in event['Records']:
+        table.put_item(
+            Item={
+                'unique': str(uuid4()),
+                'Bucket': record['s3']['bucket']['name'],
+                'Object': record['s3']['object']['key']
+            }
+        )
+👉 Click Deploy
+
+6.	Add IAM inline policy: 
+{
+  "Effect": "Allow",
+  "Action": "dynamodb:PutItem",
+  "Resource": "*"
+}
+
+7.	Upload file to S3 → Check DynamoDB 
+
+🧪 EXPERIMENT 8: SNS + SQS + Lambda
+
+Part A (SNS Email)
+1.	Open Amazon SNS → Create topic 
+2.	Create subscription → Email → Confirm 
+3.	Publish message 
+
+Part B (S3 → SNS)
+1.	Create S3 bucket 
+2.	Create SNS topic 
+3.	Add S3 event notification → SNS 
+4.	Upload file → Email received 
+
+Part C (SQS)
+1.	Open Amazon SQS → Create queue 
+2.	Send message → Receive message 
+
+Part D (Full flow)
+1.	Create SNS + SQS 
+2.	Subscribe SQS to SNS 
+3.	Add SQS policy: 
+{
+  "Effect": "Allow",
+  "Principal": {"Service": "sns.amazonaws.com"},
+  "Action": "SQS:SendMessage",
+  "Resource": "SQS ARN"
+}
+
+4.	Create Lambda → Add SQS trigger 
+5.	Add Lambda code: 
+def lambda_handler(event, context):
+    for record in event['Records']:
+        print(record['body'])
+
+-------Deploy
+
+EXPERIMENT 9: EC2 + Load Balancer
+
+1.	Open Amazon EC2 → Launch instance 
+2.	Connect → Run: 
+sudo su
+yum update -y
+yum install httpd -y
+systemctl start httpd
+systemctl enable httpd
+echo "This is Server 1" > /var/www/html/index.html
+________________________________________
+3.	Create Load Balancer → Target group → Add instance 
+4.	Fix AZ if needed → Open DNS 
+________________________________________
+ EXPERIMENT 10: Elastic Beanstalk
+________________________________________
+1.	Open AWS Elastic Beanstalk 
+2.	Create environment 
+3.	Platform → Python 
+4.	Sample application 
+5.	Select existing role 
+6.	Next → Next → Create 
+7.	Open URL 
+________________________________________
+ EXPERIMENT 11: Amazon Lex
+________________________________________
+1.	Open Amazon Lex → Create bot 
+2.	Create intent → BookHotel 
+3.	Add utterances: 
+•	Book a room 
+•	I need a hotel 
+4.	Add slots: 
+•	location → AMAZON.City 
+•	checkindate → AMAZON.Date 
+5.	Add prompts 
+6.	Build → Test 
+
+ EXPERIMENT 12: IAM User
+
+1.	Open AWS IAM → Users 
+2.	Create user → S3_Specialist 
+3.	Enable console access 
+4.	Attach policy:
+ AmazonS3FullAccess 
+5.	Login → Test 
+
+ EXPERIMENT 13: IAM Role (EC2 → S3)
+
+1.	IAM → Roles → Create role → EC2 
+2.	Attach:
+ AmazonS3FullAccess 
+3.	EC2 → Attach role 
+4.	Connect → Run: 
+aws s3 ls
+
+5.	(Optional) 
+aws s3 mb s3://my-test-bucket-12345
+
+    </h1>
+</body>
+</html>
