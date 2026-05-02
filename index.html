@@ -73,6 +73,21 @@ Part D (Full flow)<br>
 }<br>
 <br>
 4.	Create Lambda → Add SQS trigger <br>
+in role permissions add this code :<br>
+{<br>
+  "Version": "2012-10-17",<br>
+  "Statement": [<br>
+    {<br>
+      "Effect": "Allow",<br>
+      "Action": [<br>
+        "sqs:ReceiveMessage",<br>
+        "sqs:DeleteMessage",<br>
+        "sqs:GetQueueAttributes"<br>
+      ],<br>
+      "Resource": "*"<br>
+    }<br>
+  ]<br>
+}<br>
 5.	Add Lambda code: <br>
 def lambda_handler(event, context):<br>
     for record in event['Records']:<br>
