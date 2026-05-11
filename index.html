@@ -7,6 +7,1120 @@
 </head>
 <body>
     <h1>
+      week-1<br>
+      EC2 Linux Instance Creation + PuTTY Connection <br>
+
+Go to EC2 <br>
+Click Launch Instance <br>
+
+Name: <br>
+
+Linux-EC2
+
+Select AMI: <br>
+
+Ubuntu / Amazon Linux
+
+Select instance type: <br>
+
+t2.micro
+
+Create key pair or use existing <br>
+
+Download: <br>
+
+.pem file
+
+Security Group inbound rule: <br>
+
+SSH → Port 22 → My IP
+
+Launch instance <br>
+
+Convert PEM to PPK <br>
+
+Install PuTTY and PuTTYgen <br>
+
+Open PuTTYgen <br>
+Click Load <br>
+
+Select: <br>
+
+.pem file
+
+Change file type to: <br>
+
+All Files
+
+Click Open <br>
+
+Click: <br>
+
+Save private key
+
+Save as: <br>
+
+.ppk
+Connect Using PuTTY <br>
+
+Go to EC2 → Instance <br>
+
+Copy: <br>
+
+Public DNS
+
+Open PuTTY <br>
+
+Host Name: <br>
+
+Ubuntu: <br>
+
+ubuntu@<Public-DNS>
+
+Amazon Linux: <br>
+
+ec2-user@<Public-DNS>
+
+Go to: <br>
+
+Connection → SSH → Auth → Credentials
+
+Browse and load: <br>
+
+.ppk file
+
+Click Open <br>
+
+Click Yes for security alert <br>
+
+✔ Connected successfully <br>
+
+Verify Connection <br>
+
+Run: <br>
+
+whoami
+
+Ubuntu output: <br>
+
+ubuntu
+
+Amazon Linux output: <br>
+
+ec2-user
+Connect Using CloudShell <br>
+
+Open AWS Console <br>
+
+Click CloudShell icon <br>
+
+Go to EC2 → Connect <br>
+
+Open SSH Client tab <br>
+
+Copy command: <br>
+
+ssh -i mykey.pem ec2-user@<Public-IP>
+
+Paste in CloudShell <br>
+
+Initially error occurs because key not uploaded <br>
+
+Upload .pem file in CloudShell <br>
+
+Run: <br>
+
+chmod 400 mykey.pem
+
+Again run SSH command <br>
+
+✔ Connected successfully <br>
+
+Windows EC2 + RDP <br>
+
+Launch new EC2 instance <br>
+
+Select AMI: <br>
+
+Windows Server 2019/2022
+
+Instance type: <br>
+
+t2.micro
+
+Use/create keypair <br>
+
+Security Group inbound rule: <br>
+
+RDP → Port 3389 → My IP
+
+Launch instance <br>
+
+Get Windows Password <br>
+
+Go to EC2 → Windows instance <br>
+
+Click: <br>
+
+Connect → RDP Client
+
+Click: <br>
+
+Get Password
+
+Upload: <br>
+
+.pem file
+
+Click: <br>
+
+Decrypt Password
+
+Copy password <br>
+
+Username: <br>
+
+Administrator
+Connect Using RDP <br>
+
+Open Run: <br>
+
+mstsc
+
+Enter Public IP <br>
+
+Click Connect <br>
+
+Username: <br>
+
+Administrator
+
+Paste decrypted password <br>
+
+Click OK <br>
+
+✔ Windows desktop opens <br>
+
+week-2:<br>
+
+EBS Volume Creation and Attachment <br>
+
+Go to EC2 → Volumes <br>
+Click Create Volume <br>
+
+Select: <br>
+
+Volume Type → gp3
+Size → 10/20 GB
+
+Choose SAME Availability Zone as EC2 <br>
+
+Click Create Volume <br>
+
+Attach EBS Volume <br>
+
+Select created volume <br>
+
+Actions → Attach Volume <br>
+
+Select EC2 instance <br>
+
+Device name: <br>
+
+/dev/xvdf
+
+Click Attach <br>
+
+Verify in EC2 <br>
+
+Connect EC2 using SSH <br>
+
+Run: <br>
+
+lsblk
+
+✔ New disk visible: <br>
+
+/dev/xvdf
+Increase CPU and RAM (Change Instance Type) <br>
+
+Go to EC2 → Instances <br>
+
+Select instance <br>
+
+Instance state → Stop <br>
+
+Actions → Instance settings → Change instance type <br>
+
+Select bigger type: <br>
+
+t2.micro → t2.small / t2.medium
+
+Click Apply <br>
+
+Start instance <br>
+
+✔ CPU and RAM increased <br>
+
+Permanent Mount of EBS Volume <br>
+
+Connect EC2 using SSH <br>
+
+Run: <br>
+
+lsblk
+lsblk -fs
+Create Partition <br>
+
+Run: <br>
+
+fdisk /dev/xvdf
+
+Inside fdisk: <br>
+
+n
+p
+Enter
+Enter
+Enter
+w
+
+Run: <br>
+
+partprobe
+
+Verify: <br>
+
+lsblk -fs
+
+✔ Partition created: <br>
+
+/dev/xvdf1
+Format Partition <br>
+
+Run: <br>
+
+mkfs.xfs /dev/xvdf1
+
+Verify: <br>
+
+lsblk -fs
+Create Mount Directory <br>
+
+Run: <br>
+
+mkdir /mnt/archana
+Mount Volume <br>
+
+Run: <br>
+
+mount /dev/xvdf1 /mnt/archana
+
+Verify: <br>
+
+df -h
+
+✔ Volume mounted <br>
+
+Permanent Mount Using fstab <br>
+
+Get UUID: <br>
+
+blkid /dev/xvdf1
+
+Edit fstab: <br>
+
+nano /etc/fstab
+
+Add line: <br>
+
+UUID=<UUID> /mnt/archana xfs defaults,nofail 0 0
+
+Save file <br>
+
+Test: <br>
+
+mount -a
+Verify Persistence <br>
+
+Reboot instance: <br>
+
+reboot
+
+Reconnect EC2 <br>
+
+Run: <br>
+
+df -h
+
+✔ Volume auto mounted after reboot <br>
+
+Detach and Attach to Another EC2 <br>
+
+Go to Volumes <br>
+
+Select volume <br>
+
+Actions → Detach Volume <br>
+
+Attach to another EC2 in SAME AZ <br>
+
+Connect new EC2 <br>
+
+Run: <br>
+
+mkdir /mnt/archana
+mount /dev/xvdf1 /mnt/archana
+
+✔ Old data available <br>
+
+Snapshot and Cross Region Volume <br>
+
+Go to EC2 → Volumes <br>
+
+Select volume <br>
+
+Actions → Create Snapshot <br>
+
+Enter snapshot name <br>
+
+Click Create Snapshot <br>
+
+Copy Snapshot to Another Region <br>
+
+Go to Snapshots <br>
+
+Select snapshot <br>
+
+Actions → Copy Snapshot <br>
+
+Choose destination region <br>
+
+Click Copy Snapshot <br>
+
+Wait until status: <br>
+
+Completed
+Create Volume from Snapshot <br>
+
+Switch to destination region <br>
+
+Go to Snapshots <br>
+
+Select copied snapshot <br>
+
+Actions → Create Volume <br>
+
+Choose AZ <br>
+
+Click Create Volume <br>
+
+Attach Volume to EC2 <br>
+
+Launch EC2 in destination region <br>
+
+Go to Volumes <br>
+
+Select created volume <br>
+
+Actions → Attach Volume <br>
+
+Device name: <br>
+
+/dev/xvdf
+
+Attach <br>
+
+Connect EC2 <br>
+
+Run: <br>
+
+lsblk
+
+✔ Snapshot data available <br>
+
+week-3:
+<br>
+Launch EC2 Instances <br>
+
+Go to EC2 <br>
+Click Launch Instance <br>
+
+Name: <br>
+
+EFS-1
+
+Select AMI: <br>
+
+Amazon Linux
+
+Instance type: <br>
+
+t2.micro
+
+Select keypair <br>
+
+Select subnet: <br>
+
+Subnet-1a
+
+Create Security Group <br>
+
+Add inbound rules: <br>
+
+SSH → 22 → My IP
+NFS → 2049 → Anywhere
+
+Launch instance <br>
+
+Launch Second EC2 <br>
+
+Launch another EC2 <br>
+
+Name: <br>
+
+EFS-2
+
+Use same configuration <br>
+
+Select subnet: <br>
+
+Subnet-1b
+
+Launch instance <br>
+
+Create EFS File System <br>
+
+Go to EFS service <br>
+
+Click Create File System <br>
+
+Enter: <br>
+
+Name: MyEFS
+
+Select VPC <br>
+
+Enable Regional <br>
+
+Click Next <br>
+
+Delete default Security Groups <br>
+
+Select created NFS Security Group <br>
+
+Click Next → Create File System <br>
+
+✔ EFS created <br>
+
+Connect EFS-1 Instance <br>
+
+Open PowerShell / Terminal <br>
+
+Run: <br>
+
+ssh -i key.pem ec2-user@<Public-IP>
+
+Become root: <br>
+
+sudo su
+
+Create directory: <br>
+
+mkdir efs
+
+Install EFS utilities: <br>
+
+yum install -y amazon-efs-utils
+
+Verify: <br>
+
+ls
+
+Optional: <br>
+
+efs-utils --version
+Connect EFS-2 Instance <br>
+
+Open another terminal <br>
+
+Run same commands: <br>
+
+ssh -i key.pem ec2-user@<Public-IP>
+sudo su
+mkdir efs
+yum install -y amazon-efs-utils
+Attach EFS to EC2 <br>
+
+Go to EFS <br>
+
+Open created EFS <br>
+
+Click Attach <br>
+
+Select: <br>
+
+Mount via DNS
+
+Copy mount command <br>
+
+Example: <br>
+
+mount -t efs fs-xxxx:/ efs
+
+Run command on BOTH EC2 instances <br>
+
+✔ EFS mounted successfully <br>
+
+Verify EFS <br>
+
+On EFS-1 run: <br>
+
+cd efs
+touch file1
+ls
+
+On EFS-2 run: <br>
+
+cd efs
+ls
+
+✔ Same file visible on both EC2s <br>
+
+✔ Shared storage working <br>
+
+
+       Experiment-4:<br>
+       S3 — Create Bucket + Public Access <br>
+Login AWS Console <br>
+Go to S3 <br>
+Click Create bucket <br>
+Bucket name: <br>
+my-public-bucket-123
+Choose region <br>
+Under Block Public Access: <br>
+Uncheck: <br>
+Block all public access
+Tick acknowledge warning <br>
+Click Create bucket <br>
+Open bucket <br>
+Go to Permissions tab <br>
+Scroll to ACL <br>
+Click Edit <br>
+Enable: <br>
+Everyone (public access) → Read
+Save changes <br>
+Go to Objects tab <br>
+Click Upload <br>
+Add file <br>
+Click Upload <br>
+Open uploaded object <br>
+Go to Permissions <br>
+ACL → Edit <br>
+Enable: <br>
+Everyone → Read
+Save changes <br>
+Copy Object URL <br>
+Open in Incognito <br>
+✔ File opens publicly <br>
+
+S3 Versioning <br>
+Open bucket <br>
+Go to Properties <br>
+Scroll to Bucket Versioning <br>
+Click Edit <br>
+Enable Versioning <br>
+Save changes <br>
+Upload file: <br>
+report.pdf
+Upload same file again <br>
+✔ New Version ID created <br>
+✔ Old version preserved <br>
+Enable: <br>
+Show versions
+Delete object <br>
+✔ Delete marker created <br>
+✔ Old versions still available <br>
+
+Cross Region Replication (CRR) <br>
+Create another bucket in DIFFERENT region <br>
+Enable Versioning on destination bucket also <br>
+Open Source bucket <br>
+Go to Management tab <br>
+Replication rules <br>
+Create replication rule <br>
+Rule name: <br>
+academy-crr-rule
+Status → Enabled <br>
+Scope → Apply to all objects <br>
+Select destination bucket <br>
+Choose: <br>
+Use AWS managed/default role
+Replicate new objects only <br>
+Click Save <br>
+Upload new file to source bucket <br>
+✔ File automatically appears in destination bucket <br>
+
+Static Website Hosting <br>
+Create bucket <br>
+Disable Block Public Access <br>
+Upload files: <br>
+index.htmlerror.html
+Go to Properties <br>
+Static Website Hosting <br>
+Click Edit <br>
+Enable: <br>
+Host a static website
+Index document: <br>
+index.html
+Error document: <br>
+error.html
+Save changes <br>
+Go to Permissions <br>
+ACL → Edit <br>
+Enable: <br>
+Everyone → Read
+Do same ACL permission for: <br>
+index.htmlerror.html
+Go to Properties <br>
+Copy Website Endpoint <br>
+Open in browser <br>
+ Static website opens <br>
+Test invalid URL: <br>
+/invalid.html
+ error.html page displayed <br>
+
+
+ Week 5 — VPC Creation and EC2 Connection <br>
+
+Go to VPC service <br>
+Click Create VPC <br>
+
+Select: <br>
+
+VPC only
+
+Enter: <br>
+
+Name: Custom-VPC
+IPv4 CIDR: 10.0.0.0/16
+
+Click Create VPC <br>
+
+Create Public Subnet <br>
+
+Go to Subnets <br>
+Click Create subnet <br>
+
+Select VPC: <br>
+
+Custom-VPC
+
+Enter: <br>
+
+Subnet name: Public-Subnet
+AZ: us-east-1a
+CIDR: 10.0.1.0/24
+
+Click Create subnet <br>
+
+Create Private Subnet <br>
+
+Click Create subnet again <br>
+
+Enter: <br>
+
+Subnet name: Private-Subnet
+AZ: us-east-1a
+CIDR: 10.0.2.0/24
+
+Click Create subnet <br>
+
+Create Internet Gateway <br>
+
+Go to Internet Gateways <br>
+Click Create Internet Gateway <br>
+
+Enter: <br>
+
+Custom-IGW
+
+Click Create <br>
+
+Select IGW <br>
+Actions → Attach to VPC <br>
+
+Select: <br>
+Custom-VPC
+Attach <br>
+Create Public Route Table <br>
+Go to Route Tables <br>
+Click Create Route Table <br>
+Enter: <br>
+Public-RT
+Select VPC → Custom-VPC <br>
+Create Route Table <br>
+Open Route Table <br>
+Go to Routes tab <br>
+Edit routes <br>
+Add route: <br>
+Destination: 0.0.0.0/0
+Target: Internet Gateway
+Save changes <br>
+Go to Subnet Associations <br>
+Edit associations <br>
+Select: <br>
+Public-Subnet
+Save <br>
+Create Private Route Table <br>
+Create another Route Table <br>
+Name: <br>
+Private-RT
+Select VPC → Custom-VPC <br>
+Keep default local route only <br>
+Go to Subnet Associations <br>
+Associate with: <br>
+Private-Subnet
+Save <br>
+Enable Auto Assign Public IP <br>
+Go to Subnets <br>
+Select Public-Subnet <br>
+Actions → Edit subnet settings <br>
+Enable: <br>
+Auto-assign public IPv4 address
+Save <br>
+Create Security Group <br>
+Go to Security Groups <br>
+Create Security Group <br>
+Enter: <br>
+Name: Web-SG
+Select VPC → Custom-VPC <br>
+Add inbound rules: <br>
+HTTP → Port 80
+HTTPS → Port 443
+SSH → Port 22 → My IP
+Create Security Group <br>
+Launch Public EC2 <br>
+Go to EC2 <br>
+Launch Instance <br>
+Name: <br>
+Public-EC2
+Select subnet: <br>
+Public-Subnet
+Attach Security Group: <br>
+Web-SG
+Launch instance <br>
+✔ Public instance gets internet access <br>
+Launch Private EC2 <br>
+Launch another EC2 <br>
+Name: <br>
+Private-EC2
+Select subnet: <br>
+Private-Subnet
+Attach same SG or DB SG <br>
+Launch instance <br>
+✔ No direct internet access <br>
+✔ Cannot SSH directly from internet <br>
+Verify Setup <br>
+Public EC2: <br>
+ping google.com
+✔ Internet works <br>
+Private EC2: <br>
+✔ No direct public access <br>
+
+week-6:
+VPC Using Bastion Server <br>
+
+Launch EC2 instance <br>
+
+Name: <br>
+
+Bastion-Server
+
+Select: <br>
+
+Public-Subnet
+
+Create/use .ppk keypair <br>
+
+Security Group inbound rules: <br>
+
+SSH → Port 22 → My IP
+MYSQL/AURORA → Port 3306
+
+Launch instance <br>
+
+Install WinSCP <br>
+
+Download WinSCP from Google <br>
+Install in system <br>
+
+Open WinSCP <br>
+
+Connect Bastion Server using WinSCP <br>
+
+Copy Bastion Server Public IP <br>
+
+Paste in: <br>
+
+Host Name
+
+Click Advanced <br>
+
+Go to: <br>
+
+Authentication
+
+Browse and select: <br>
+
+.ppk file
+
+Click OK <br>
+Click Login <br>
+
+Accept certificate <br>
+
+Username: <br>
+
+ubuntu
+
+(or ec2-user for Amazon Linux) <br>
+
+Transfer PEM File <br>
+
+Drag and drop .pem file from desktop to WinSCP right side window <br>
+
+✔ PEM copied to Bastion Server <br>
+
+Connect Bastion using PuTTY <br>
+
+Open PuTTY <br>
+
+Connect Bastion Server using .ppk <br>
+
+Run commands: <br>
+
+sudo su
+ls
+Check .pem file present <br>
+Connect Private EC2 from Bastion <br>
+Run: <br>
+chmod 400 mykey.pem
+Connect private instance using private IP: <br>
+ssh -i mykey.pem ec2-user@<Private-IP>
+Example: <br>
+ssh -i mykey.pem ec2-user@10.0.2.159
+✔ Private subnet connected successfully <br>
+✔ This is called Bastion Host architecture <br>
+Why Bastion Server? <br>
+Private subnet instances cannot be accessed directly from internet. <br>
+Bastion Server acts as jump server to access private instances securely. <br>
+NAT Gateway <br>
+Without NAT Gateway private instances cannot: <br>
+yum update
+apt update
+install packages
+Because private subnet has no internet access. <br>
+Create NAT Gateway <br>
+Go to NAT Gateway <br>
+Click Create NAT Gateway <br>
+Enter: <br>
+Name: Custom-NAT
+Select: <br>
+Public-Subnet
+Allocate Elastic IP automatically <br>
+Click Create NAT Gateway <br>
+Create Route Table for NAT <br>
+Go to Route Tables <br>
+Create Route Table <br>
+Name: <br>
+Private-NAT-RT
+Select VPC <br>
+Create Route Table <br>
+Associate Private Subnet <br>
+Open Route Table <br>
+Actions → Edit subnet associations <br>
+Select: <br>
+Private-Subnet
+Save <br>
+Add NAT Route <br>
+Go to Routes tab <br>
+Edit routes <br>
+Add route: <br>
+Destination: 0.0.0.0/0
+Target: NAT Gateway
+Save changes <br>
+Verify NAT Gateway <br>
+Connect private instance through Bastion <br>
+Run: <br>
+yum update -y
+or <br>
+ping google.com
+
+week-6 withoit winscp <br>
+VPC Using Bastion Server (Without WinSCP) <br>
+
+Launch EC2 instance <br>
+
+Name: <br>
+
+Bastion-Server
+
+Select: <br>
+
+Public-Subnet
+
+Use same keypair for Bastion and Private EC2 <br>
+
+Security Group inbound rules: <br>
+
+SSH → Port 22 → My IP
+MYSQL/AURORA → Port 3306
+
+Launch instance <br>
+
+Configure Private EC2 Security Group <br>
+
+Open Private EC2 Security Group <br>
+
+Add inbound rule: <br>
+
+SSH → Source = Bastion Security Group
+
+Save rules <br>
+
+Connect Bastion Server using PuTTY <br>
+
+Open PuTTY <br>
+
+Enter Bastion Public IP <br>
+
+Load .ppk file <br>
+
+Click Open <br>
+
+Run: <br>
+
+sudo su
+
+Check private IP of private EC2 from AWS Console <br>
+
+Example: <br>
+
+10.0.2.159
+Connect Private EC2 from Bastion <br>
+
+Run command: <br>
+
+ssh ec2-user@10.0.2.159
+
+If Ubuntu: <br>
+
+ssh ubuntu@10.0.2.159
+
+Type: <br>
+
+yes
+
+if prompted <br>
+
+✔ Private subnet connected successfully <br>
+
+Verify Connection <br>
+
+Run: <br>
+
+hostname
+
+or <br>
+
+ifconfig
+
+✔ Private EC2 details displayed <br>
+
+Why Bastion Server? <br>
+
+Private subnet instances cannot be accessed directly from internet. <br>
+
+Bastion Server acts as jump server for secure access. <br>
+
+NAT Gateway <br>
+
+Private subnet cannot install/update packages without internet. <br>
+
+Commands like below fail initially: <br>
+
+yum update -y
+
+or <br>
+
+apt update
+Create NAT Gateway <br>
+
+Go to NAT Gateway <br>
+Click Create NAT Gateway <br>
+
+Enter: <br>
+
+Name: Custom-NAT
+
+Select subnet: <br>
+
+Public-Subnet
+
+Allocate Elastic IP automatically <br>
+
+Click Create NAT Gateway <br>
+
+Create Route Table for NAT <br>
+
+Go to Route Tables <br>
+Create Route Table <br>
+
+Name: <br>
+
+Private-NAT-RT
+
+Select VPC <br>
+
+Create Route Table <br>
+
+Associate Private Subnet <br>
+
+Open Route Table <br>
+
+Actions → Edit subnet associations <br>
+
+Select: <br>
+
+Private-Subnet
+
+Save <br>
+
+Add NAT Route <br>
+
+Go to Routes tab <br>
+Edit routes <br>
+
+Add route: <br>
+
+Destination: 0.0.0.0/0
+Target: NAT Gateway
+
+Save changes <br>
+
+Verify NAT Gateway <br>
+
+Connect Private EC2 through Bastion <br>
+
+Run: <br>
+
+ping google.com
+
+or <br>
+
+yum update -y
+      
         EXPERIMENT 7: S3 → Lambda → DynamoDB<br>
 Steps:<br>
 1.	Open Amazon S3 → Create bucket (enable versioning) <br>
@@ -153,6 +1267,1289 @@ aws s3 ls<br>
 5.	(Optional) <br>
 aws s3 mb s3://my-test-bucket-12345<br>
 <br>
+
+
+<br>
+Experiment-7<br>
+EXPERIMENT 7 — Lambda + S3 + DynamoDB <br>
+Create S3 Bucket <br>
+
+Go to S3 <br>
+Click Create bucket <br>
+
+Select: <br>
+
+General purpose
+
+Bucket name: <br>
+
+my-lambda-bucket
+
+Enable Versioning <br>
+
+Click Create bucket <br>
+
+Create DynamoDB Table <br>
+
+Search DynamoDB <br>
+Click Create table <br>
+
+Table name: <br>
+
+newtable
+
+Partition key: <br>
+
+unique
+Type → String
+
+Click Create table <br>
+
+Create Lambda Function <br>
+
+Search Lambda <br>
+Click Create function <br>
+
+Select: <br>
+
+Author from scratch
+
+Function name: <br>
+
+s3-trigger-function
+
+Runtime: <br>
+
+Python 3.x
+
+Permissions: <br>
+
+Use existing role: <br>
+
+LabRole
+
+OR <br>
+
+Create new role with basic Lambda permissions
+
+Click Create function <br>
+
+Add S3 Trigger <br>
+
+Inside Lambda function <br>
+
+Click Add trigger <br>
+
+Select: <br>
+
+S3
+
+Choose bucket: <br>
+
+my-lambda-bucket
+
+Event type: <br>
+
+All object create events
+
+Tick acknowledge <br>
+
+Click Add <br>
+
+Add Lambda Code <br>
+
+Delete default code <br>
+
+Paste this code: <br>
+
+import boto3
+from uuid import uuid4
+
+def lambda_handler(event, context):
+
+    s3 = boto3.client("s3")
+    dynamodb = boto3.resource('dynamodb')
+
+    if 'Records' in event:
+
+        for record in event['Records']:
+
+            bucket_name = record['s3']['bucket']['name']
+            object_key = record['s3']['object']['key']
+            size = record['s3']['object'].get('size', -1)
+            event_name = record.get('eventName', 'Unknown')
+            event_time = record.get('eventTime', 'Unknown')
+
+            dynamoTable = dynamodb.Table('newtable')
+
+            dynamoTable.put_item(
+                Item={
+                    'unique': str(uuid4()),
+                    'Bucket': bucket_name,
+                    'Object': object_key,
+                    'Size': size,
+                    'Event': event_name,
+                    'EventTime': event_time
+                }
+            )
+
+    else:
+        print("No Records key found")
+
+Click Deploy <br>
+
+✔ Lambda deployed <br>
+
+If Permission Error Comes <br>
+
+Go to IAM <br>
+Roles <br>
+
+Select Lambda Role <br>
+
+Click: <br>
+
+Add permissions → Create inline policy
+
+Go to JSON tab <br>
+
+Paste: <br>
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "dynamodb:PutItem",
+      "Resource": "arn:aws:dynamodb:*:*:table/newtable"
+    }
+  ]
+}
+
+Click Next <br>
+
+Policy name: <br>
+
+lambda-dynamo-policy
+
+Click Create policy <br>
+
+Test the Trigger <br>
+
+Go to S3 bucket <br>
+
+Upload any file <br>
+
+Example: <br>
+
+image.jpg
+test.pdf
+
+✔ Lambda automatically triggers <br>
+
+Verify in DynamoDB <br>
+
+Go to DynamoDB <br>
+
+Open table: <br>
+
+newtable
+
+Click: <br>
+
+Explore table items
+
+Click Run <br>
+
+✔ Uploaded file details visible <br>
+
+Monitor Using CloudWatch <br>
+
+Go to Lambda function <br>
+
+Monitor tab <br>
+
+Click: <br>
+
+View CloudWatch Logs
+
+Open latest log stream <br>
+
+✔ Lambda execution logs visible <br>
+<br>
+week:8 <br>
+SNS — Create Topic and Send Email <br>
+
+Go to SNS <br>
+Click Topics <br>
+Click Create topic <br>
+
+Select: <br>
+
+Standard
+
+Topic name: <br>
+
+MyEmailTopic
+
+Click Create topic <br>
+
+Create Email Subscription <br>
+
+Open created topic <br>
+
+Go to Subscriptions <br>
+
+Click Create subscription <br>
+
+Protocol: <br>
+
+Email
+
+Endpoint: <br>
+
+your-email@gmail.com
+
+Click Create subscription <br>
+
+Confirm Subscription <br>
+
+Open email inbox <br>
+
+Open AWS SNS mail <br>
+
+Click: <br>
+
+Confirm subscription
+
+✔ Email subscribed successfully <br>
+
+Publish Test Message <br>
+
+Open SNS topic <br>
+
+Click Publish message <br>
+
+Subject: <br>
+
+Test Mail
+
+Message body: <br>
+
+Hello this is SNS test
+
+Click Publish message <br>
+
+✔ Email notification received <br>
+
+S3 → SNS → Email Notification <br>
+Create S3 Bucket <br>
+
+Go to S3 <br>
+
+Click Create bucket <br>
+
+Bucket name: <br>
+
+my-upload-bucket-2026
+
+Select SAME region as SNS topic <br>
+
+Click Create bucket <br>
+
+Configure SNS Access Policy <br>
+
+Open SNS Topic <br>
+
+Go to Access Policy <br>
+
+Click Edit <br>
+
+Paste policy: <br>
+
+{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Principal": {
+    "Service": "s3.amazonaws.com"
+   },
+   "Action": "SNS:Publish",
+   "Resource": "SNS-TOPIC-ARN",
+   "Condition": {
+    "ArnLike": {
+     "aws:SourceArn": "S3-BUCKET-ARN"
+    }
+   }
+  }
+ ]
+}
+
+Save changes <br>
+
+Configure S3 Event Notification <br>
+
+Open S3 bucket <br>
+
+Go to Properties <br>
+
+Scroll to: <br>
+
+Event notifications
+
+Click Create event notification <br>
+
+Event name: <br>
+
+UploadNotification
+
+Event type: <br>
+
+All object create events
+
+Destination: <br>
+
+SNS Topic
+
+Select topic <br>
+
+Click Save changes <br>
+
+Test S3 → SNS <br>
+
+Upload any file into S3 bucket <br>
+
+✔ SNS sends email notification automatically <br>
+
+SQS Queue Creation <br>
+
+Go to SQS <br>
+
+Click Create queue <br>
+
+Select: <br>
+
+Standard
+
+Queue name: <br>
+
+MyQueue
+
+Click Create queue <br>
+
+Send Message to SQS <br>
+
+Open queue <br>
+
+Click Send and receive messages <br>
+
+Message body: <br>
+
+Hello this is SQS test message
+
+Click Send message <br>
+
+Receive Message from SQS <br>
+
+Click: <br>
+
+Poll for messages
+
+✔ Message displayed <br>
+
+Optional: <br>
+
+Delete message
+S3 → SNS → SQS → Lambda Architecture <br>
+Create S3 Bucket <br>
+
+Bucket name: <br>
+
+mys3eventbucket123
+
+Click Create bucket <br>
+
+Create SNS Topic <br>
+
+Topic name: <br>
+
+MyS3SNSTopic
+
+Copy SNS Topic ARN <br>
+
+Create SQS Queue <br>
+
+Queue name: <br>
+
+MyS3Queue
+
+Copy Queue ARN <br>
+
+Subscribe SQS to SNS <br>
+
+Open SNS Topic <br>
+
+Click Create subscription <br>
+
+Protocol: <br>
+
+Amazon SQS
+
+Endpoint: <br>
+
+MyS3Queue
+
+Click Create subscription <br>
+
+Add SQS Access Policy <br>
+
+Open SQS Queue <br>
+
+Access Policy → Edit <br>
+
+Paste: <br>
+
+{
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Principal": {
+    "Service": "sns.amazonaws.com"
+   },
+   "Action": "sqs:SendMessage",
+   "Resource": "SQS-ARN",
+   "Condition": {
+    "ArnEquals": {
+     "aws:SourceArn": "SNS-ARN"
+    }
+   }
+  }
+ ]
+}
+
+Save <br>
+
+Configure SNS Access Policy <br>
+
+Open SNS Topic <br>
+
+Edit Access Policy <br>
+
+Paste: <br>
+
+{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Principal": {
+    "Service": "s3.amazonaws.com"
+   },
+   "Action": "SNS:Publish",
+   "Resource": "SNS-TOPIC-ARN",
+   "Condition": {
+    "ArnLike": {
+     "aws:SourceArn": "S3-BUCKET-ARN"
+    }
+   }
+  }
+ ]
+}
+
+Save <br>
+
+Configure S3 Event Notification <br>
+
+Open S3 bucket <br>
+
+Properties → Event Notifications <br>
+
+Click Create event notification <br>
+
+Event name: <br>
+
+S3UploadEvent
+
+Event type: <br>
+
+All object create events
+
+Destination: <br>
+
+SNS Topic
+
+Select: <br>
+
+MyS3SNSTopic
+
+Save changes <br>
+
+Verify SQS Message <br>
+
+Upload file into S3 bucket <br>
+
+Go to SQS Queue <br>
+
+Click Poll for messages <br>
+
+✔ S3 event message visible <br>
+
+Create Lambda Consumer <br>
+
+Go to Lambda <br>
+
+Click Create function <br>
+
+Function name: <br>
+
+SQSConsumerFunction
+
+Runtime: <br>
+
+Python 3.x
+
+Select: <br>
+
+LabRole
+
+Click Create function <br>
+
+Add SQS Trigger <br>
+
+Inside Lambda <br>
+
+Click Add Trigger <br>
+
+Select: <br>
+
+SQS
+
+Choose queue: <br>
+
+MyS3Queue
+
+Click Add <br>
+
+Add Lambda Code <br>
+
+Paste: <br>
+
+def lambda_handler(event, context):
+
+    for record in event['Records']:
+
+        print("Message received from SQS:")
+        print(record['body'])
+
+    return {
+        'statusCode': 200,
+        'body': 'Message processed successfully'
+    }
+
+Click Deploy <br>
+
+Test Complete Architecture <br>
+
+Upload file into S3 bucket <br>
+
+Flow: <br>
+
+S3 → SNS → SQS → Lambda
+
+✔ Lambda automatically processes message <br>
+
+Verify Logs <br>
+
+Go to Lambda → Monitor <br>
+
+Click View CloudWatch Logs <br>
+
+✔ SQS messages visible in logs <br>
+week-9:<br>
+Elastic Load Balancer (ALB) + Auto Scaling <br>
+Launch EC2 Instance 1 <br>
+
+Go to EC2 <br>
+
+Click Launch Instance <br>
+
+Name: <br>
+
+webserver-1
+
+AMI: <br>
+
+Amazon Linux 2
+
+Instance type: <br>
+
+t2.micro
+
+Security Group inbound rules: <br>
+
+SSH → 22 → My IP
+HTTP → 80 → 0.0.0.0/0
+
+Launch instance <br>
+
+Configure Apache Server <br>
+
+Connect EC2 using SSH <br>
+
+Run: <br>
+
+sudo su
+yum update -y
+yum install httpd -y
+systemctl start httpd
+systemctl enable httpd
+echo "This is Server 1" > /var/www/html/index.html
+Launch EC2 Instance 2 <br>
+
+Launch another EC2 <br>
+
+Name: <br>
+
+webserver-2
+
+Use same configuration <br>
+
+Connect using SSH <br>
+
+Run: <br>
+
+sudo su
+yum update -y
+yum install httpd -y
+systemctl start httpd
+systemctl enable httpd
+echo "This is Server 2" > /var/www/html/index.html
+Create Load Balancer Security Group <br>
+
+Go to Security Groups <br>
+
+Click Create Security Group <br>
+
+Name: <br>
+
+lb-sg
+
+Inbound rules: <br>
+
+HTTP → 80 → Anywhere
+
+Click Create <br>
+
+Create Application Load Balancer <br>
+
+Go to EC2 → Load Balancers <br>
+
+Click Create Load Balancer <br>
+
+Select: <br>
+
+Application Load Balancer
+
+Name: <br>
+
+my-alb
+
+Scheme: <br>
+
+Internet-facing
+
+IP type: <br>
+
+IPv4
+
+Listener: <br>
+
+HTTP → 80
+Configure Network <br>
+
+Select default VPC <br>
+
+Select minimum 2 subnets <br>
+
+Choose: <br>
+
+lb-sg
+
+security group <br>
+
+Create Target Group <br>
+
+Create new target group <br>
+
+Name: <br>
+
+web-servers-tg
+
+Target type: <br>
+
+Instance
+
+Protocol: <br>
+
+HTTP
+
+Port: <br>
+
+80
+
+Health check path: <br>
+
+/
+
+Click Next <br>
+
+Register Targets <br>
+
+Select: <br>
+
+webserver-1
+webserver-2
+
+Click: <br>
+
+Include as pending
+
+Click Register targets <br>
+
+Click Create Load Balancer <br>
+
+Wait few minutes <br>
+
+✔ ALB created <br>
+
+Verify Load Balancer <br>
+
+Open Load Balancer <br>
+
+Copy DNS name <br>
+
+Paste in browser <br>
+
+✔ Displays: <br>
+
+This is Server 1
+
+Refresh page multiple times <br>
+
+✔ Displays: <br>
+
+This is Server 2
+
+Traffic distributed successfully <br>
+
+Verify Health Checks <br>
+
+Go to Target Groups <br>
+
+Open: <br>
+
+web-servers-tg
+
+Targets tab <br>
+
+✔ Both instances should show: <br>
+
+Healthy
+Create AMI from Existing EC2 <br>
+
+Go to EC2 → Instances <br>
+
+Select configured instance <br>
+
+Actions → Image and templates → Create image <br>
+
+AMI name: <br>
+
+my-webserver-ami
+
+Click Create Image <br>
+
+Wait until status becomes: <br>
+
+Available
+Create Launch Template <br>
+
+Go to EC2 → Launch Templates <br>
+
+Click Create Launch Template <br>
+
+Template name: <br>
+
+my-launch-template
+
+Select created AMI <br>
+
+Instance type: <br>
+
+t2.micro
+
+Select keypair <br>
+
+Select Security Group <br>
+
+Click Create Launch Template <br>
+
+Create Auto Scaling Group <br>
+
+Go to EC2 → Auto Scaling Groups <br>
+
+Click Create Auto Scaling Group <br>
+
+Name: <br>
+
+webserver-asg
+
+Select: <br>
+
+my-launch-template
+
+Click Next <br>
+
+Configure Network <br>
+
+Select VPC <br>
+
+Select all subnets <br>
+
+Enable: <br>
+
+Attach to existing Load Balancer
+
+Choose existing ALB <br>
+
+Health check type: <br>
+
+HTTP
+
+Grace period: <br>
+
+300
+
+Click Next <br>
+
+Configure Group Size <br>
+
+Desired capacity: <br>
+
+2
+
+Minimum capacity: <br>
+
+1
+
+Maximum capacity: <br>
+
+4
+
+Click Next <br>
+
+Click Create Auto Scaling Group <br>
+
+✔ ASG created <br>
+
+Verify Auto Scaling <br>
+
+Go to Auto Scaling Group <br>
+
+Instances tab <br>
+
+✔ Instances running automatically <br>
+
+Terminate one instance manually <br>
+
+✔ ASG launches new instance automatically <br>
+
+Test Load Balancer <br>
+
+Copy ALB DNS Name <br>
+
+Open in browser <br>
+
+Refresh multiple times <br>
+
+✔ Traffic distributed between servers <br>
+
+✔ Auto Scaling + Load Balancer working <br>
+week-10:
+Open Elastic Beanstalk <br>
+
+Login AWS Console <br>
+
+Search: <br>
+
+Elastic Beanstalk
+
+Click Create Application <br>
+
+Create Application <br>
+
+Application name: <br>
+
+MyApp
+
+Description optional <br>
+
+Click Create <br>
+
+Create Environment <br>
+
+Click: <br>
+
+Create Environment
+
+Select: <br>
+
+Web Server Environment
+
+Click Select <br>
+
+Configure Environment <br>
+
+Environment name: <br>
+
+myapp-env
+
+Choose Platform: <br>
+
+Java
+Python
+Node.js
+PHP
+
+(choose according to application) <br>
+
+Upload Application Code <br>
+
+Under Application Code <br>
+
+Select: <br>
+
+Upload your code
+
+Upload: <br>
+
+.war
+.zip
+.php
+
+file <br>
+
+Configure Service Access <br>
+
+Service Role: <br>
+
+LabRole
+
+EC2 Key Pair: <br>
+
+Optional
+
+EC2 Instance Profile: <br>
+
+LabInstanceProfile
+Configure Network <br>
+
+Select VPC <br>
+
+Select subnets <br>
+
+Enable: <br>
+
+Public IP
+Configure Instance and Scaling <br>
+
+Instance type: <br>
+
+t2.micro
+
+Minimum instances: <br>
+
+1
+
+Maximum instances: <br>
+
+2
+
+Enable Load Balancer <br>
+
+Create Environment <br>
+
+Click Review <br>
+
+Click Create <br>
+
+Wait few minutes <br>
+
+✔ Elastic Beanstalk automatically creates: <br>
+
+EC2
+Load Balancer
+Auto Scaling Group
+Security Groups
+Access Application <br>
+
+After deployment AWS provides URL <br>
+
+Example: <br>
+
+http://myapp-env.us-east-1.elasticbeanstalk.com
+
+Open URL in browser <br>
+
+✔ Application running successfully <br>
+
+Update Application <br>
+
+Open Environment <br>
+
+Click: <br>
+
+Upload and Deploy
+
+Upload new version <br>
+
+✔ Application updated <br>
+week-12:
+Login AWS Console as Root User <br>
+
+Search: <br>
+
+IAM
+
+Go to: <br>
+
+Users → Create User
+
+User name: <br>
+
+S3_Specialist
+
+Enable: <br>
+
+Provide user access to AWS Management Console
+
+Select: <br>
+
+Custom Password
+
+Click Next <br>
+
+Attach S3 Permission <br>
+
+Select: <br>
+
+Attach policies directly
+
+Search and select: <br>
+
+AmazonS3FullAccess
+
+Click Next → Create User <br>
+
+Download: <br>
+
+.csv file
+
+✔ IAM user created <br>
+
+Login Using IAM User <br>
+
+Copy Account ID <br>
+
+Sign out root account <br>
+
+Open IAM sign-in URL <br>
+
+Enter: <br>
+
+Account ID
+IAM Username
+Password
+
+Login successfully <br>
+
+Verify Permissions <br>
+
+Go to EC2 <br>
+
+✔ Access Denied shown <br>
+
+Go to S3 <br>
+
+✔ Bucket creation works <br>
+
+This proves user has only S3 access <br>
+
+Create Access Keys for CLI <br>
+
+Login as Admin/Root <br>
+
+Go to IAM → Users <br>
+
+Select created user <br>
+
+Go to: <br>
+
+Security Credentials
+
+Scroll to Access Keys <br>
+
+Click Create Access Key <br>
+
+Select: <br>
+
+Command Line Interface (CLI)
+
+Download CSV file <br>
+
+✔ Access Key ID and Secret Key generated <br>
+
+Install AWS CLI <br>
+
+Download AWS CLI from: <br>
+
+AWS CLI Installer
+ <br>
+
+Install AWS CLI <br>
+
+Configure AWS CLI <br>
+
+Open CMD / Terminal <br>
+
+Run: <br>
+
+aws configure
+
+Enter: <br>
+
+Access Key ID
+Secret Access Key
+Region → ap-south-1
+Output → json
+
+✔ CLI configured <br>
+
+Verify CLI Access <br>
+
+Run: <br>
+
+aws ec2 describe-instances
+
+✔ AccessDenied shown <br>
+
+Run: <br>
+
+aws s3 ls
+
+✔ S3 buckets listed <br>
+
+Create bucket using CLI: <br>
+
+aws s3 mb s3://your-unique-bucket-name
+
+✔ Bucket created successfully <br>
+
+
+
+
+week-13:
+EXPERIMENT 13 — IAM ROLE FOR EC2 (KEYLESS ACCESS) <br>
+Create IAM Role <br>
+
+Login AWS Console <br>
+
+Search: <br>
+
+IAM
+
+Go to: <br>
+
+Roles → Create Role
+
+Trusted entity: <br>
+
+AWS Service
+
+Use case: <br>
+
+EC2
+
+Click Next <br>
+
+Attach Permission to Role <br>
+
+Search and select: <br>
+
+AmazonS3FullAccess
+
+Click Next <br>
+
+Role name: <br>
+
+EC2-S3-Role
+
+Click Create Role <br>
+
+✔ IAM Role created <br>
+
+Create EC2 Instance <br>
+
+Launch EC2 normally <br>
+
+Connect using SSH <br>
+
+Run: <br>
+
+aws ec2 describe-instances
+
+✔ Unauthorized shown initially <br>
+
+Because no role attached <br>
+
+Attach IAM Role to EC2 <br>
+
+Go to EC2 Console <br>
+
+Select running instance <br>
+
+Actions → Security → Modify IAM Role <br>
+
+Select: <br>
+
+EC2-S3-Role
+
+Click Update IAM Role <br>
+
+✔ Role attached successfully <br>
+
+Verify Role Access <br>
+
+Connect EC2 using SSH <br>
+
+Run: <br>
+
+aws s3 ls
+
+✔ S3 access works <br>
+
+Run: <br>
+
+aws ec2 describe-instances
+
+✔ Unauthorized still shown <br>
+
+Because role has only S3 access <br>
+
+No Access Key or Secret Key required <br>
+
+AWS automatically provides temporary credentials <br>
     </h1>
 </body>
 </html>
