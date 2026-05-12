@@ -7,2549 +7,1611 @@
 </head>
 <body>
     <h1>
-      week-1<br>
-      EC2 Linux Instance Creation + PuTTY Connection <br>
-
-Go to EC2 <br>
-Click Launch Instance <br>
-
-Name: <br>
-
-Linux-EC2
-
-Select AMI: <br>
-
-Ubuntu / Amazon Linux
-
-Select instance type: <br>
-
-t2.micro
-
-Create key pair or use existing <br>
-
-Download: <br>
-
-.pem file
-
-Security Group inbound rule: <br>
-
-SSH → Port 22 → My IP
-
-Launch instance <br>
-
-Convert PEM to PPK <br>
-
-Install PuTTY and PuTTYgen <br>
-
-Open PuTTYgen <br>
-Click Load <br>
-
-Select: <br>
-
-.pem file
-
-Change file type to: <br>
-
-All Files
-
-Click Open <br>
-
-Click: <br>
-
-Save private key
-
-Save as: <br>
-
-.ppk
-Connect Using PuTTY <br>
-
-Go to EC2 → Instance <br>
-
-Copy: <br>
-
-Public DNS
-
-Open PuTTY <br>
-
-Host Name: <br>
-
-Ubuntu: <br>
-
-ubuntu@<Public-DNS>
-
-Amazon Linux: <br>
-
-ec2-user@<Public-DNS>
-
-Go to: <br>
-
-Connection → SSH → Auth → Credentials
-
-Browse and load: <br>
-
-.ppk file
-
-Click Open <br>
-
-Click Yes for security alert <br>
-
-✔ Connected successfully <br>
-
-Verify Connection <br>
-
-Run: <br>
-
-whoami
-
-Ubuntu output: <br>
-
-ubuntu
-
-Amazon Linux output: <br>
-
-ec2-user
-Connect Using CloudShell <br>
-
-Open AWS Console <br>
-
-Click CloudShell icon <br>
-
-Go to EC2 → Connect <br>
-
-Open SSH Client tab <br>
-
-Copy command: <br>
-
-ssh -i mykey.pem ec2-user@<Public-IP>
-
-Paste in CloudShell <br>
-
-Initially error occurs because key not uploaded <br>
-
-Upload .pem file in CloudShell <br>
-
-Run: <br>
-
-chmod 400 mykey.pem
-
-Again run SSH command <br>
-
-✔ Connected successfully <br>
-
-Windows EC2 + RDP <br>
-
-Launch new EC2 instance <br>
-
-Select AMI: <br>
-
-Windows Server 2019/2022
-
-Instance type: <br>
-
-t2.micro
-
-Use/create keypair <br>
-
-Security Group inbound rule: <br>
-
-RDP → Port 3389 → My IP
-
-Launch instance <br>
-
-Get Windows Password <br>
-
-Go to EC2 → Windows instance <br>
-
-Click: <br>
-
-Connect → RDP Client
-
-Click: <br>
-
-Get Password
-
-Upload: <br>
-
-.pem file
-
-Click: <br>
-
-Decrypt Password
-
-Copy password <br>
-
-Username: <br>
-
-Administrator
-Connect Using RDP <br>
-
-Open Run: <br>
-
-mstsc
-
-Enter Public IP <br>
-
-Click Connect <br>
-
-Username: <br>
-
-Administrator
-
-Paste decrypted password <br>
-
-Click OK <br>
-
-✔ Windows desktop opens <br>
-
-week-2:<br>
-
-EBS Volume Creation and Attachment <br>
-
-Go to EC2 → Volumes <br>
-Click Create Volume <br>
-
-Select: <br>
-
-Volume Type → gp3
-Size → 10/20 GB
-
-Choose SAME Availability Zone as EC2 <br>
-
-Click Create Volume <br>
-
-Attach EBS Volume <br>
-
-Select created volume <br>
-
-Actions → Attach Volume <br>
-
-Select EC2 instance <br>
-
-Device name: <br>
-
-/dev/xvdf
-
-Click Attach <br>
-
-Verify in EC2 <br>
-
-Connect EC2 using SSH <br>
-
-Run: <br>
-
-lsblk
-
-✔ New disk visible: <br>
-
-/dev/xvdf
-Increase CPU and RAM (Change Instance Type) <br>
-
-Go to EC2 → Instances <br>
-
-Select instance <br>
-
-Instance state → Stop <br>
-
-Actions → Instance settings → Change instance type <br>
-
-Select bigger type: <br>
-
-t2.micro → t2.small / t2.medium
-
-Click Apply <br>
-
-Start instance <br>
-
-✔ CPU and RAM increased <br>
-
-Permanent Mount of EBS Volume <br>
-
-Connect EC2 using SSH <br>
-
-Run: <br>
-
-lsblk
-lsblk -fs
-Create Partition <br>
-
-Run: <br>
-
-fdisk /dev/xvdf
-
-Inside fdisk: <br>
-
-n
-p
-Enter
-Enter
-Enter
-w
-
-Run: <br>
-
-partprobe
-
-Verify: <br>
-
-lsblk -fs
-
-✔ Partition created: <br>
-
-/dev/xvdf1
-Format Partition <br>
-
-Run: <br>
-
-mkfs.xfs /dev/xvdf1
-
-Verify: <br>
-
-lsblk -fs
-Create Mount Directory <br>
-
-Run: <br>
-
-mkdir /mnt/archana
-Mount Volume <br>
-
-Run: <br>
-
-mount /dev/xvdf1 /mnt/archana
-
-Verify: <br>
-
-df -h
-
-✔ Volume mounted <br>
-
-Permanent Mount Using fstab <br>
-
-Get UUID: <br>
-
-blkid /dev/xvdf1
-
-Edit fstab: <br>
-
-nano /etc/fstab
-
-Add line: <br>
-
-UUID=<UUID> /mnt/archana xfs defaults,nofail 0 0
-
-Save file <br>
-
-Test: <br>
-
-mount -a
-Verify Persistence <br>
-
-Reboot instance: <br>
-
-reboot
-
-Reconnect EC2 <br>
-
-Run: <br>
-
-df -h
-
-✔ Volume auto mounted after reboot <br>
-
-Detach and Attach to Another EC2 <br>
-
-Go to Volumes <br>
-
-Select volume <br>
-
-Actions → Detach Volume <br>
-
-Attach to another EC2 in SAME AZ <br>
-
-Connect new EC2 <br>
-
-Run: <br>
-
-mkdir /mnt/archana
-mount /dev/xvdf1 /mnt/archana
-
-✔ Old data available <br>
-
-Snapshot and Cross Region Volume <br>
-
-Go to EC2 → Volumes <br>
-
-Select volume <br>
-
-Actions → Create Snapshot <br>
-
-Enter snapshot name <br>
-
-Click Create Snapshot <br>
-
-Copy Snapshot to Another Region <br>
-
-Go to Snapshots <br>
-
-Select snapshot <br>
-
-Actions → Copy Snapshot <br>
-
-Choose destination region <br>
-
-Click Copy Snapshot <br>
-
-Wait until status: <br>
-
-Completed
-Create Volume from Snapshot <br>
-
-Switch to destination region <br>
-
-Go to Snapshots <br>
-
-Select copied snapshot <br>
-
-Actions → Create Volume <br>
-
-Choose AZ <br>
-
-Click Create Volume <br>
-
-Attach Volume to EC2 <br>
-
-Launch EC2 in destination region <br>
-
-Go to Volumes <br>
-
-Select created volume <br>
-
-Actions → Attach Volume <br>
-
-Device name: <br>
-
-/dev/xvdf
-
-Attach <br>
-
-Connect EC2 <br>
-
-Run: <br>
-
-lsblk
-
-✔ Snapshot data available <br>
-
-week-3:
+        Experiment-1- Scaling<br>
 <br>
-Launch EC2 Instances <br>
-
-Go to EC2 <br>
-Click Launch Instance <br>
-
-Name: <br>
-
-EFS-1
-
-Select AMI: <br>
-
-Amazon Linux
-
-Instance type: <br>
-
-t2.micro
-
-Select keypair <br>
-
-Select subnet: <br>
-
-Subnet-1a
-
-Create Security Group <br>
-
-Add inbound rules: <br>
-
-SSH → 22 → My IP
-NFS → 2049 → Anywhere
-
-Launch instance <br>
-
-Launch Second EC2 <br>
-
-Launch another EC2 <br>
-
-Name: <br>
-
-EFS-2
-
-Use same configuration <br>
-
-Select subnet: <br>
-
-Subnet-1b
-
-Launch instance <br>
-
-Create EFS File System <br>
-
-Go to EFS service <br>
-
-Click Create File System <br>
-
-Enter: <br>
-
-Name: MyEFS
-
-Select VPC <br>
-
-Enable Regional <br>
-
-Click Next <br>
-
-Delete default Security Groups <br>
-
-Select created NFS Security Group <br>
-
-Click Next → Create File System <br>
-
-✔ EFS created <br>
-
-Connect EFS-1 Instance <br>
-
-Open PowerShell / Terminal <br>
-
-Run: <br>
-
-ssh -i key.pem ec2-user@<Public-IP>
-
-Become root: <br>
-
-sudo su
-
-Create directory: <br>
-
-mkdir efs
-
-Install EFS utilities: <br>
-
-yum install -y amazon-efs-utils
-
-Verify: <br>
-
-ls
-
-Optional: <br>
-
-efs-utils --version
-Connect EFS-2 Instance <br>
-
-Open another terminal <br>
-
-Run same commands: <br>
-
-ssh -i key.pem ec2-user@<Public-IP>
-sudo su
-mkdir efs
-yum install -y amazon-efs-utils
-Attach EFS to EC2 <br>
-
-Go to EFS <br>
-
-Open created EFS <br>
-
-Click Attach <br>
-
-Select: <br>
-
-Mount via DNS
-
-Copy mount command <br>
-
-Example: <br>
-
-mount -t efs fs-xxxx:/ efs
-
-Run command on BOTH EC2 instances <br>
-
-✔ EFS mounted successfully <br>
-
-Verify EFS <br>
-
-On EFS-1 run: <br>
-
-cd efs
-touch file1
-ls
-
-On EFS-2 run: <br>
-
-cd efs
-ls
-
-✔ Same file visible on both EC2s <br>
-
-✔ Shared storage working <br>
-
-
-       Experiment-4:<br>
-       S3 — Create Bucket + Public Access <br>
-Login AWS Console <br>
-Go to S3 <br>
-Click Create bucket <br>
-Bucket name: <br>
-my-public-bucket-123
-Choose region <br>
-Under Block Public Access: <br>
-Uncheck: <br>
-Block all public access
-Tick acknowledge warning <br>
-Click Create bucket <br>
-Open bucket <br>
-Go to Permissions tab <br>
-Scroll to ACL <br>
-Click Edit <br>
-Enable: <br>
-Everyone (public access) → Read
-Save changes <br>
-Go to Objects tab <br>
-Click Upload <br>
-Add file <br>
-Click Upload <br>
-Open uploaded object <br>
-Go to Permissions <br>
-ACL → Edit <br>
-Enable: <br>
-Everyone → Read
-Save changes <br>
-Copy Object URL <br>
-Open in Incognito <br>
-✔ File opens publicly <br>
-
-S3 Versioning <br>
-Open bucket <br>
-Go to Properties <br>
-Scroll to Bucket Versioning <br>
-Click Edit <br>
-Enable Versioning <br>
-Save changes <br>
-Upload file: <br>
-report.pdf
-Upload same file again <br>
-✔ New Version ID created <br>
-✔ Old version preserved <br>
-Enable: <br>
-Show versions
-Delete object <br>
-✔ Delete marker created <br>
-✔ Old versions still available <br>
-
-Cross Region Replication (CRR) <br>
-Create another bucket in DIFFERENT region <br>
-Enable Versioning on destination bucket also <br>
-Open Source bucket <br>
-Go to Management tab <br>
-Replication rules <br>
-Create replication rule <br>
-Rule name: <br>
-academy-crr-rule
-Status → Enabled <br>
-Scope → Apply to all objects <br>
-Select destination bucket <br>
-Choose: <br>
-Use AWS managed/default role
-Replicate new objects only <br>
-Click Save <br>
-Upload new file to source bucket <br>
-✔ File automatically appears in destination bucket <br>
-
-Static Website Hosting <br>
-Create bucket <br>
-Disable Block Public Access <br>
-Upload files: <br>
-index.htmlerror.html
-Go to Properties <br>
-Static Website Hosting <br>
-Click Edit <br>
-Enable: <br>
-Host a static website
-Index document: <br>
-index.html
-Error document: <br>
-error.html
-Save changes <br>
-Go to Permissions <br>
-ACL → Edit <br>
-Enable: <br>
-Everyone → Read
-Do same ACL permission for: <br>
-index.htmlerror.html
-Go to Properties <br>
-Copy Website Endpoint <br>
-Open in browser <br>
- Static website opens <br>
-Test invalid URL: <br>
-/invalid.html
- error.html page displayed <br>
-
-
- Week 5 — VPC Creation and EC2 Connection <br>
-
-Go to VPC service <br>
-Click Create VPC <br>
-
-Select: <br>
-
-VPC only
-
-Enter: <br>
-
-Name: Custom-VPC
-IPv4 CIDR: 10.0.0.0/16
-
-Click Create VPC <br>
-
-Create Public Subnet <br>
-
-Go to Subnets <br>
-Click Create subnet <br>
-
-Select VPC: <br>
-
-Custom-VPC
-
-Enter: <br>
-
-Subnet name: Public-Subnet
-AZ: us-east-1a
-CIDR: 10.0.1.0/24
-
-Click Create subnet <br>
-
-Create Private Subnet <br>
-
-Click Create subnet again <br>
-
-Enter: <br>
-
-Subnet name: Private-Subnet
-AZ: us-east-1a
-CIDR: 10.0.2.0/24
-
-Click Create subnet <br>
-
-Create Internet Gateway <br>
-
-Go to Internet Gateways <br>
-Click Create Internet Gateway <br>
-
-Enter: <br>
-
-Custom-IGW
-
-Click Create <br>
-
-Select IGW <br>
-Actions → Attach to VPC <br>
-
-Select: <br>
-Custom-VPC
-Attach <br>
-Create Public Route Table <br>
-Go to Route Tables <br>
-Click Create Route Table <br>
-Enter: <br>
-Public-RT
-Select VPC → Custom-VPC <br>
-Create Route Table <br>
-Open Route Table <br>
-Go to Routes tab <br>
-Edit routes <br>
-Add route: <br>
-Destination: 0.0.0.0/0
-Target: Internet Gateway
-Save changes <br>
-Go to Subnet Associations <br>
-Edit associations <br>
-Select: <br>
-Public-Subnet
-Save <br>
-Create Private Route Table <br>
-Create another Route Table <br>
-Name: <br>
-Private-RT
-Select VPC → Custom-VPC <br>
-Keep default local route only <br>
-Go to Subnet Associations <br>
-Associate with: <br>
-Private-Subnet
-Save <br>
-Enable Auto Assign Public IP <br>
-Go to Subnets <br>
-Select Public-Subnet <br>
-Actions → Edit subnet settings <br>
-Enable: <br>
-Auto-assign public IPv4 address
-Save <br>
-Create Security Group <br>
-Go to Security Groups <br>
-Create Security Group <br>
-Enter: <br>
-Name: Web-SG
-Select VPC → Custom-VPC <br>
-Add inbound rules: <br>
-HTTP → Port 80
-HTTPS → Port 443
-SSH → Port 22 → My IP
-Create Security Group <br>
-Launch Public EC2 <br>
-Go to EC2 <br>
-Launch Instance <br>
-Name: <br>
-Public-EC2
-Select subnet: <br>
-Public-Subnet
-Attach Security Group: <br>
-Web-SG
-Launch instance <br>
-✔ Public instance gets internet access <br>
-Launch Private EC2 <br>
-Launch another EC2 <br>
-Name: <br>
-Private-EC2
-Select subnet: <br>
-Private-Subnet
-Attach same SG or DB SG <br>
-Launch instance <br>
-✔ No direct internet access <br>
-✔ Cannot SSH directly from internet <br>
-Verify Setup <br>
-Public EC2: <br>
-ping google.com
-✔ Internet works <br>
-Private EC2: <br>
-✔ No direct public access <br>
-
-week-6:
-VPC Using Bastion Server <br>
-
-Launch EC2 instance <br>
-
-Name: <br>
-
-Bastion-Server
-
-Select: <br>
-
-Public-Subnet
-
-Create/use .ppk keypair <br>
-
-Security Group inbound rules: <br>
-
-SSH → Port 22 → My IP
-MYSQL/AURORA → Port 3306
-
-Launch instance <br>
-
-Install WinSCP <br>
-
-Download WinSCP from Google <br>
-Install in system <br>
-
-Open WinSCP <br>
-
-Connect Bastion Server using WinSCP <br>
-
-Copy Bastion Server Public IP <br>
-
-Paste in: <br>
-
-Host Name
-
-Click Advanced <br>
-
-Go to: <br>
-
-Authentication
-
-Browse and select: <br>
-
-.ppk file
-
-Click OK <br>
-Click Login <br>
-
-Accept certificate <br>
-
-Username: <br>
-
-ubuntu
-
-(or ec2-user for Amazon Linux) <br>
-
-Transfer PEM File <br>
-
-Drag and drop .pem file from desktop to WinSCP right side window <br>
-
-✔ PEM copied to Bastion Server <br>
-
-Connect Bastion using PuTTY <br>
-
-Open PuTTY <br>
-
-Connect Bastion Server using .ppk <br>
-
-Run commands: <br>
-
-sudo su
-ls
-Check .pem file present <br>
-Connect Private EC2 from Bastion <br>
-Run: <br>
-chmod 400 mykey.pem
-Connect private instance using private IP: <br>
-ssh -i mykey.pem ec2-user@<Private-IP>
-Example: <br>
-ssh -i mykey.pem ec2-user@10.0.2.159
-✔ Private subnet connected successfully <br>
-✔ This is called Bastion Host architecture <br>
-Why Bastion Server? <br>
-Private subnet instances cannot be accessed directly from internet. <br>
-Bastion Server acts as jump server to access private instances securely. <br>
-NAT Gateway <br>
-Without NAT Gateway private instances cannot: <br>
-yum update
-apt update
-install packages
-Because private subnet has no internet access. <br>
-Create NAT Gateway <br>
-Go to NAT Gateway <br>
-Click Create NAT Gateway <br>
-Enter: <br>
-Name: Custom-NAT
-Select: <br>
-Public-Subnet
-Allocate Elastic IP automatically <br>
-Click Create NAT Gateway <br>
-Create Route Table for NAT <br>
-Go to Route Tables <br>
-Create Route Table <br>
-Name: <br>
-Private-NAT-RT
-Select VPC <br>
-Create Route Table <br>
-Associate Private Subnet <br>
-Open Route Table <br>
-Actions → Edit subnet associations <br>
-Select: <br>
-Private-Subnet
-Save <br>
-Add NAT Route <br>
-Go to Routes tab <br>
-Edit routes <br>
-Add route: <br>
-Destination: 0.0.0.0/0
-Target: NAT Gateway
-Save changes <br>
-Verify NAT Gateway <br>
-Connect private instance through Bastion <br>
-Run: <br>
-yum update -y
-or <br>
-ping google.com
-
-week-6 withoit winscp <br>
-VPC Using Bastion Server (Without WinSCP) <br>
-
-Launch EC2 instance <br>
-
-Name: <br>
-
-Bastion-Server
-
-Select: <br>
-
-Public-Subnet
-
-Use same keypair for Bastion and Private EC2 <br>
-
-Security Group inbound rules: <br>
-
-SSH → Port 22 → My IP
-MYSQL/AURORA → Port 3306
-
-Launch instance <br>
-
-Configure Private EC2 Security Group <br>
-
-Open Private EC2 Security Group <br>
-
-Add inbound rule: <br>
-
-SSH → Source = Bastion Security Group
-
-Save rules <br>
-
-Connect Bastion Server using PuTTY <br>
-
-Open PuTTY <br>
-
-Enter Bastion Public IP <br>
-
-Load .ppk file <br>
-
-Click Open <br>
-
-Run: <br>
-
-sudo su
-
-Check private IP of private EC2 from AWS Console <br>
-
-Example: <br>
-
-10.0.2.159
-Connect Private EC2 from Bastion <br>
-
-Run command: <br>
-
-ssh ec2-user@10.0.2.159
-
-If Ubuntu: <br>
-
-ssh ubuntu@10.0.2.159
-
-Type: <br>
-
-yes
-
-if prompted <br>
-
-✔ Private subnet connected successfully <br>
-
-Verify Connection <br>
-
-Run: <br>
-
-hostname
-
-or <br>
-
-ifconfig
-
-✔ Private EC2 details displayed <br>
-
-Why Bastion Server? <br>
-
-Private subnet instances cannot be accessed directly from internet. <br>
-
-Bastion Server acts as jump server for secure access. <br>
-
-NAT Gateway <br>
-
-Private subnet cannot install/update packages without internet. <br>
-
-Commands like below fail initially: <br>
-
-yum update -y
-
-or <br>
-
-apt update
-Create NAT Gateway <br>
-
-Go to NAT Gateway <br>
-Click Create NAT Gateway <br>
-
-Enter: <br>
-
-Name: Custom-NAT
-
-Select subnet: <br>
-
-Public-Subnet
-
-Allocate Elastic IP automatically <br>
-
-Click Create NAT Gateway <br>
-
-Create Route Table for NAT <br>
-
-Go to Route Tables <br>
-Create Route Table <br>
-
-Name: <br>
-
-Private-NAT-RT
-
-Select VPC <br>
-
-Create Route Table <br>
-
-Associate Private Subnet <br>
-
-Open Route Table <br>
-
-Actions → Edit subnet associations <br>
-
-Select: <br>
-
-Private-Subnet
-
-Save <br>
-
-Add NAT Route <br>
-
-Go to Routes tab <br>
-Edit routes <br>
-
-Add route: <br>
-
-Destination: 0.0.0.0/0
-Target: NAT Gateway
-
-Save changes <br>
-
-Verify NAT Gateway <br>
-
-Connect Private EC2 through Bastion <br>
-
-Run: <br>
-
-ping google.com
-
-or <br>
-
-yum update -y
-      
-        EXPERIMENT 7: S3 → Lambda → DynamoDB<br>
-Steps:<br>
-1.	Open Amazon S3 → Create bucket (enable versioning) <br>
-2.	Open Amazon DynamoDB → Create table <br>
-o	Name: newtable <br>
-o	Partition key: unique <br>
-3.	Open AWS Lambda → Create function <br>
-o	Runtime: Python <br>
-o	Use existing role <br>
-4.	Add S3 trigger → select bucket → All object create events <br>
-5.	Replace Lambda code with: <br>
-import boto3<br>
-from uuid import uuid4<br>
-
-def lambda_handler(event, context):<br>
-    dynamodb = boto3.resource('dynamodb')<br>
-    table = dynamodb.Table('newtable')<br>
-
-    for record in event['Records']:<br>
-        table.put_item(<br>
-            Item={<br>
-                'unique': str(uuid4()),<br>
-                'Bucket': record['s3']['bucket']['name'],<br>
-                'Object': record['s3']['object']['key']<br>
-            }<br>
+import numpy as np<br>
+import matplotlib.pyplot as plt<br>
+import cv2<br>
+<br>
+# --------------------------------<br>
+# a) Generate random pixel grid<br>
+# --------------------------------<br>
+random_grid = np.random.rand(100, 100)<br>
+<br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(random_grid, cmap='gray')<br>
+plt.title("Random Pixel Intensity Grid")<br>
+plt.axis('off')<br>
+plt.show()<br>
+<br>
+# --------------------------------<br>
+# b) Mathematical patterns<br>
+# --------------------------------<br>
+x = np.linspace(-5, 5, 100)<br>
+y = np.linspace(-5, 5, 100)<br>
+<br>
+X, Y = np.meshgrid(x, y)<br>
+<br>
+# Sinusoidal pattern<br>
+sin_pattern = np.sin(X) + np.cos(Y)<br>
+sin_pattern_norm = (sin_pattern - sin_pattern.min()) / (sin_pattern.max() - sin_pattern.min())<br>
+<br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(sin_pattern_norm, cmap='viridis')<br>
+plt.title("Sinusoidal Pattern")<br>
+plt.axis('off')<br>
+plt.show()<br>
+<br>
+# Gaussian pattern<br>
+gaussian_pattern = np.exp(-(X**2 + Y**2))<br>
+<br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(gaussian_pattern, cmap='hot')<br>
+plt.title("Gaussian Pattern")<br>
+plt.axis('off')<br>
+plt.show()<br>
+<br>
+# --------------------------------<br>
+# c) Display synthetic patterns<br>
+# --------------------------------<br>
+<br>
+# Already displayed above using matplotlib<br>
+<br>
+# --------------------------------<br>
+# d) Downscale random noise image<br>
+# --------------------------------<br>
+low_res = cv2.resize(random_grid, (25, 25), interpolation=cv2.INTER_AREA)<br>
+<br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(low_res, cmap='gray')<br>
+plt.title("Downscaled Random Noise")<br>
+plt.axis('off')<br>
+plt.show()<br>
+<br>
+# --------------------------------<br>
+# Manual Upscaling using interpolation<br>
+# --------------------------------<br>
+upscaled = cv2.resize(low_res, (100, 100), interpolation=cv2.INTER_LINEAR)<br>
+<br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(upscaled, cmap='gray')<br>
+plt.title("Upscaled Random Noise")<br>
+plt.axis('off')<br>
+plt.show()<br>
+<br>
+# --------------------------------<br>
+# e) Combine two images/features<br>
+# --------------------------------<br>
+combined_image = (random_grid + sin_pattern_norm) / 2<br>
+<br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(combined_image, cmap='gray')<br>
+plt.title("Combined Image by Averaging")<br>
+plt.axis('off')<br>
+plt.show()<br>
+<br>
+<br>
+<br>
+COLOR IMAGE <br>
+import numpy as np<br>
+import matplotlib.pyplot as plt<br>
+import cv2 <br>
+<br>
+# -----------------------------<br>
+# a) Generate a grid of random pixel intensities (COLOR)<br>
+# -----------------------------<br>
+random_color = np.random.rand(100, 100, 3) <br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(random_color) <br>
+plt.title("Random Color Pixel Intensities") <br>
+plt.axis('off') <br>
+plt.show() <br>
+<br>
+# -----------------------------<br>
+# b) Apply mathematical functions (Sinusoidal & Gaussian)<br>
+# -----------------------------<br>
+x = np.linspace(0, 10, 100) <br>
+y = np.linspace(0, 10, 100) <br>
+X, Y = np.meshgrid(x, y) <br>
+<br>
+# Create color sinusoidal pattern<br>
+sin_r = np.sin(X) <br>
+sin_g = np.cos(Y) <br>
+sin_b = np.sin(X + Y)<br>
+sin_pattern = np.stack((sin_r, sin_g, sin_b), axis=2) <br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(sin_pattern) <br>
+plt.title("Color Sinusoidal Pattern") <br>
+plt.axis('off') <br>
+plt.show() <br>
+<br>
+# Gaussian pattern (same for all channels)<br>
+gaussian = np.exp(-(X**2 + Y**2))<br>
+gaussian_pattern = np.stack((gaussian, gaussian, gaussian), axis=2) <br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(gaussian_pattern) <br>
+plt.title("Color Gaussian Pattern") <br>
+plt.axis('off') <br>
+plt.show() <br>
+<br>
+# -----------------------------<br>
+# d) Downscale color image to low resolution<br>
+# -----------------------------<br>
+image = (random_color * 255).astype(np.uint8) <br>
+low_res = cv2.resize(image, (25, 25), interpolation=cv2.INTER_AREA) <br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(low_res) <br>
+plt.title("Downscaled Color Image") <br>
+plt.axis('off') <br>
+plt.show() <br>
+<br>
+# -----------------------------<br>
+# Upscale image using interpolation<br>
+# -----------------------------<br>
+upscaled = cv2.resize(low_res, (100, 100), interpolation=cv2.INTER_LINEAR) <br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(upscaled) <br>
+plt.title("Upscaled Color Image") <br>
+plt.axis('off') <br>
+plt.show() <br>
+<br>
+# -----------------------------<br>
+# e) Combine two color images by averaging<br>
+# -----------------------------<br>
+combined_image = (random_color + sin_pattern) / 2<br>
+plt.figure(figsize=(4, 3))<br>
+plt.imshow(combined_image) <br>
+plt.title("Combined Color Image (Averaged)") <br>
+plt.axis('off') <br>
+plt.show()<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Experiment-2- GAN<br>
+<br>
+import tensorflow as tf<br>
+from tensorflow.keras import layers<br>
+import numpy as np<br>
+import matplotlib.pyplot as plt<br>
+import os<br>
+import time<br>
+<br>
+# ------------------------------------<br>
+# 1. Configuration Parameters<br>
+# ------------------------------------<br>
+LATENT_DIM = 100<br>
+BATCH_SIZE = 128<br>
+EPOCHS = 50<br>
+BUFFER_SIZE = 60000<br>
+OUTPUT_DIR = "gan_images"<br>
+<br>
+os.makedirs(OUTPUT_DIR, exist_ok=True)<br>
+<br>
+# ------------------------------------<br>
+# 2. Set Random Seeds<br>
+# ------------------------------------<br>
+tf.random.set_seed(42)<br>
+np.random.seed(42)<br>
+<br>
+# ------------------------------------<br>
+# 3. Load MNIST Dataset<br>
+# ------------------------------------<br>
+(x_train, _), (_, _) = tf.keras.datasets.mnist.load_data()<br>
+<br>
+# ------------------------------------<br>
+# 4. Preprocess Data<br>
+# ------------------------------------<br>
+x_train = x_train.astype("float32")<br>
+x_train = (x_train - 127.5) / 127.5      # Normalize to [-1,1]<br>
+x_train = np.expand_dims(x_train, axis=-1)  # (28,28,1)<br>
+<br>
+# ------------------------------------<br>
+# 5. Create Dataset Pipeline<br>
+# ------------------------------------<br>
+dataset = tf.data.Dataset.from_tensor_slices(x_train)<br>
+dataset = dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE)<br>
+<br>
+# ------------------------------------<br>
+# 6. Build Generator<br>
+# ------------------------------------<br>
+def build_generator():<br>
+    model = tf.keras.Sequential()<br>
+<br>
+    model.add(layers.Dense(7*7*256, use_bias=False, input_shape=(LATENT_DIM,)))<br>
+    model.add(layers.BatchNormalization())<br>
+    model.add(layers.LeakyReLU())<br>
+<br>
+    model.add(layers.Reshape((7, 7, 256)))<br>
+<br>
+    model.add(layers.Conv2DTranspose(128, (5,5), strides=(1,1), padding='same'))<br>
+    model.add(layers.BatchNormalization())<br>
+    model.add(layers.LeakyReLU())<br>
+<br>
+    model.add(layers.Conv2DTranspose(64, (5,5), strides=(2,2), padding='same'))<br>
+    model.add(layers.BatchNormalization())<br>
+    model.add(layers.LeakyReLU())<br>
+<br>
+    model.add(layers.Conv2DTranspose(1, (5,5), strides=(2,2),<br>
+                                     padding='same', activation='tanh'))<br>
+<br>
+    return model<br>
+<br>
+generator = build_generator()<br>
+<br>
+# ------------------------------------<br>
+# 7. Build Discriminator<br>
+# ------------------------------------<br>
+def build_discriminator():<br>
+    model = tf.keras.Sequential()<br>
+<br>
+    model.add(layers.Conv2D(64, (5,5), strides=(2,2),<br>
+                            padding='same', input_shape=[28,28,1]))<br>
+    model.add(layers.LeakyReLU())<br>
+    model.add(layers.Dropout(0.3))<br>
+<br>
+    model.add(layers.Conv2D(128, (5,5), strides=(2,2), padding='same'))<br>
+    model.add(layers.LeakyReLU())<br>
+    model.add(layers.Dropout(0.3))<br>
+<br>
+    model.add(layers.Flatten())<br>
+    model.add(layers.Dense(1))<br>
+<br>
+    return model<br>
+<br>
+discriminator = build_discriminator()<br>
+<br>
+# ------------------------------------<br>
+# 8. Loss Function<br>
+# ------------------------------------<br>
+loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits=True)<br>
+<br>
+def generator_loss(fake_output):<br>
+    return loss_fn(tf.ones_like(fake_output), fake_output)<br>
+<br>
+def discriminator_loss(real_output, fake_output):<br>
+    real_loss = loss_fn(tf.ones_like(real_output), real_output)<br>
+    fake_loss = loss_fn(tf.zeros_like(fake_output), fake_output)<br>
+    return real_loss + fake_loss<br>
+<br>
+# ------------------------------------<br>
+# 9. Optimizers<br>
+# ------------------------------------<br>
+gen_optimizer = tf.keras.optimizers.Adam(0.0002, beta_1=0.5)<br>
+disc_optimizer = tf.keras.optimizers.Adam(0.0002, beta_1=0.5)<br>
+<br>
+# ------------------------------------<br>
+# 10. Fixed Noise Vector<br>
+# ------------------------------------<br>
+NUM_EXAMPLES = 16<br>
+seed = tf.random.normal([NUM_EXAMPLES, LATENT_DIM])<br>
+<br>
+# ------------------------------------<br>
+# 11. Training Step<br>
+# ------------------------------------<br>
+@tf.function<br>
+def train_step(images):<br>
+<br>
+    noise = tf.random.normal([BATCH_SIZE, LATENT_DIM])<br>
+<br>
+    with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:<br>
+<br>
+        fake_images = generator(noise, training=True)<br>
+<br>
+        real_output = discriminator(images, training=True)<br>
+        fake_output = discriminator(fake_images, training=True)<br>
+<br>
+        gen_loss = generator_loss(fake_output)<br>
+        disc_loss = discriminator_loss(real_output, fake_output)<br>
+<br>
+    gen_gradients = gen_tape.gradient(gen_loss, generator.trainable_variables)<br>
+    disc_gradients = disc_tape.gradient(disc_loss, discriminator.trainable_variables)<br>
+<br>
+    gen_optimizer.apply_gradients(zip(gen_gradients,<br>
+                                      generator.trainable_variables))<br>
+    disc_optimizer.apply_gradients(zip(disc_gradients,<br>
+                                       discriminator.trainable_variables))<br>
+<br>
+    return gen_loss, disc_loss<br>
+<br>
+# ------------------------------------<br>
+# 12. Save Generated Images<br>
+# ------------------------------------<br>
+def generate_and_save_images(model, epoch, test_input):<br>
+<br>
+    predictions = model(test_input, training=False)<br>
+<br>
+    fig = plt.figure(figsize=(4,4))<br>
+<br>
+    for i in range(predictions.shape[0]):<br>
+        plt.subplot(4,4,i+1)<br>
+        plt.imshow((predictions[i,:,:,0] + 1)/2, cmap='gray')<br>
+        plt.axis('off')<br>
+<br>
+    plt.savefig(f"{OUTPUT_DIR}/epoch_{epoch}.png")<br>
+    plt.close()<br>
+<br>
+# ------------------------------------<br>
+# 13. Training Loop<br>
+# ------------------------------------<br>
+def train(dataset, epochs):<br>
+<br>
+    for epoch in range(epochs):<br>
+        start = time.time()<br>
+<br>
+        for image_batch in dataset:<br>
+            gen_loss, disc_loss = train_step(image_batch)<br>
+<br>
+        generate_and_save_images(generator, epoch+1, seed)<br>
+<br>
+        print(f"Epoch {epoch+1}/{epochs} | "<br>
+              f"Gen Loss: {gen_loss:.4f} | "<br>
+              f"Disc Loss: {disc_loss:.4f} | "<br>
+              f"Time: {time.time()-start:.2f}s")<br>
+<br>
+# ------------------------------------<br>
+# 14. Start Training<br>
+# ------------------------------------<br>
+train(dataset, EPOCHS)<br>
+<br>
+# ------------------------------------<br>
+# 15. Generate New Images After Training<br>
+# ------------------------------------<br>
+random_noise = tf.random.normal([16, LATENT_DIM])<br>
+generate_and_save_images(generator, "final", random_noise)<br>
+<br>
+print("Training completed.")<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Experiment-3- VAE<br>
+<br>
+import numpy as np<br>
+import matplotlib.pyplot as plt<br>
+import tensorflow as tf<br>
+from tensorflow import keras<br>
+from tensorflow.keras import layers, ops<br>
+<br>
+# -----------------------------<br>
+# Data Loading & Preprocessing<br>
+# -----------------------------<br>
+(x_train, _), (x_test, _) = keras.datasets.fashion_mnist.load_data()<br>
+<br>
+x_train = x_train.astype("float32") / 255.0<br>
+x_test = x_test.astype("float32") / 255.0<br>
+<br>
+x_train = x_train.reshape(-1, 784)<br>
+x_test = x_test.reshape(-1, 784)<br>
+<br>
+LATENT_DIM = 16<br>
+EPS = 1e-7<br>
+<br>
+# -----------------------------<br>
+# Reparameterization Trick<br>
+# -----------------------------<br>
+def sample_z(args):<br>
+    z_mean, z_log_var = args<br>
+    eps = keras.random.normal(shape=ops.shape(z_mean))<br>
+    return z_mean + ops.exp(0.5 * z_log_var) * eps<br>
+<br>
+# -----------------------------<br>
+# Encoder<br>
+# -----------------------------<br>
+inp = keras.Input(shape=(784,))<br>
+h = layers.Dense(256, activation="relu")(inp)<br>
+h = layers.Dense(128, activation="relu")(h)<br>
+<br>
+z_mean = layers.Dense(LATENT_DIM, name="z_mean")(h)<br>
+z_log_var = layers.Dense(LATENT_DIM, name="z_log_var")(h)<br>
+z = layers.Lambda(sample_z, name="z")([z_mean, z_log_var])<br>
+<br>
+# -----------------------------<br>
+# Decoder<br>
+# -----------------------------<br>
+d = layers.Dense(128, activation="relu")(z)<br>
+d = layers.Dense(256, activation="relu")(d)<br>
+recon = layers.Dense(784, activation="sigmoid", name="recon")(d)<br>
+<br>
+# Pack outputs (as shown in slides)<br>
+out = layers.Concatenate()([recon, z_mean, z_log_var])<br>
+<br>
+vae = keras.Model(inp, out)<br>
+<br>
+# -----------------------------<br>
+# Loss Functions<br>
+# -----------------------------<br>
+def recon_bce_per_sample(y_true, y_pred):<br>
+    y_pred = ops.clip(y_pred, EPS, 1.0 - EPS)<br>
+    bce = -(y_true * ops.log(y_pred) +<br>
+            (1.0 - y_true) * ops.log(1.0 - y_pred))<br>
+    return ops.sum(bce, axis=1)<br>
+<br>
+def kl_per_sample(z_mean, z_log_var):<br>
+    return -0.5 * ops.sum(<br>
+        1 + z_log_var - ops.square(z_mean) - ops.exp(z_log_var),<br>
+        axis=1<br>
+    )<br>
+<br>
+def vae_loss(y_true, y_pred):<br>
+    recon = y_pred[:, :784]<br>
+    z_mean_p = y_pred[:, 784:784 + LATENT_DIM]<br>
+    z_log_var_p = y_pred[:, 784 + LATENT_DIM:]<br>
+<br>
+    recon_loss = recon_bce_per_sample(y_true, recon)<br>
+    kl_loss = kl_per_sample(z_mean_p, z_log_var_p)<br>
+<br>
+    return ops.mean(recon_loss + kl_loss)<br>
+<br>
+# -----------------------------<br>
+# Compile & Train<br>
+# -----------------------------<br>
+vae.compile(optimizer="adam", loss=vae_loss)<br>
+<br>
+vae.fit(<br>
+    x_train, x_train,<br>
+    validation_data=(x_test, x_test),<br>
+    epochs=20,<br>
+    batch_size=128<br>
+)<br>
+<br>
+# -----------------------------<br>
+# Evaluation<br>
+# -----------------------------<br>
+vae.evaluate(x_test, x_test)<br>
+<br>
+# -----------------------------<br>
+# Reconstruction & Plotting<br>
+# -----------------------------<br>
+idx = np.random.randint(0, x_test.shape[0])<br>
+x_in = x_test[idx:idx + 1]<br>
+<br>
+packed_out = vae.predict(x_in, verbose=0)<br>
+recon_flat = packed_out[:, :784]<br>
+<br>
+orig_img = x_in.reshape(28, 28)<br>
+recon_img = recon_flat.reshape(28, 28)<br>
+<br>
+plt.figure(figsize=(6, 3))<br>
+<br>
+plt.subplot(1, 2, 1)<br>
+plt.imshow(orig_img, cmap="gray")<br>
+plt.title("Original Image")<br>
+plt.axis("off")<br>
+<br>
+plt.subplot(1, 2, 2)<br>
+plt.imshow(recon_img, cmap="gray")<br>
+plt.title("Reconstructed Image")<br>
+plt.axis("off")<br>
+<br>
+plt.tight_layout()<br>
+plt.show()<br>
+<br>
+<br>
+<br>
+Experiment-4-Image captioning<br>
+<br>
+import os<br>
+import re<br>
+import numpy as np<br>
+import pandas as pd<br>
+import tensorflow as tf<br>
+from tensorflow.keras import layers, Model<br>
+from tensorflow.keras.applications import ResNet50<br>
+from tensorflow.keras.applications.resnet50 import preprocess_input<br>
+from tensorflow.keras.preprocessing.image import load_img, img_to_array<br>
+from tensorflow.keras.preprocessing.text import Tokenizer<br>
+from tensorflow.keras.preprocessing.sequence import pad_sequences<br>
+<br>
+IMAGE_DIR = "Images"<br>
+CAPTION_FILE = "captions.txt"<br>
+<br>
+MAX_IMAGES = 300<br>
+MAX_LEN = 25<br>
+VOCAB_SIZE = 3000<br>
+EMBED_DIM = 128<br>
+BATCH_SIZE = 32<br>
+EPOCHS = 5<br>
+<br>
+data = pd.read_csv(CAPTION_FILE)<br>
+<br>
+print(data.head())<br>
+print(data.columns)<br>
+<br>
+def clean_text(text):<br>
+    text = str(text).lower()<br>
+    text = re.sub(r"[^a-z ]", "", text)<br>
+    text = re.sub(r"\s+", " ", text).strip()<br>
+    return "startseq " + text + " endseq"<br>
+<br>
+captions = {}<br>
+<br>
+for _, row in data.iterrows():<br>
+    img = row["image"]<br>
+    cap = clean_text(row["caption"])<br>
+<br>
+    if len(captions) >= MAX_IMAGES and img not in captions:<br>
+        continue<br>
+<br>
+    img_path = os.path.join(IMAGE_DIR, img)<br>
+<br>
+    if os.path.exists(img_path):<br>
+        captions.setdefault(img, []).append(cap)<br>
+<br>
+print("Total images used:", len(captions))<br>
+<br>
+all_captions = []<br>
+<br>
+for caps in captions.values():<br>
+    all_captions.extend(caps)<br>
+<br>
+tokenizer = Tokenizer(num_words=VOCAB_SIZE, oov_token="<unk>")<br>
+tokenizer.fit_on_texts(all_captions)<br>
+<br>
+vocab_size = min(VOCAB_SIZE, len(tokenizer.word_index)) + 1<br>
+<br>
+base_model = ResNet50(weights="imagenet", include_top=False)<br>
+base_model.trainable = False<br>
+<br>
+cnn_model = Model(base_model.input, base_model.output)<br>
+<br>
+def extract_feature(img_name):<br>
+    path = os.path.join(IMAGE_DIR, img_name)<br>
+<br>
+    img = load_img(path, target_size=(224, 224))<br>
+    img = img_to_array(img)<br>
+    img = np.expand_dims(img, axis=0)<br>
+    img = img.copy()<br>
+    img = preprocess_input(img)<br>
+<br>
+    feature = cnn_model.predict(img, verbose=0)<br>
+    feature = feature.reshape(49, 2048)<br>
+<br>
+    return feature<br>
+<br>
+features = {}<br>
+<br>
+for img_name in captions.keys():<br>
+    features[img_name] = extract_feature(img_name)<br>
+<br>
+X_img = []<br>
+X_seq = []<br>
+Y = []<br>
+<br>
+for img_name, caps in captions.items():<br>
+    feature = features[img_name]<br>
+<br>
+    for cap in caps:<br>
+        seq = tokenizer.texts_to_sequences([cap])[0]<br>
+<br>
+        for i in range(1, len(seq)):<br>
+            input_seq = pad_sequences(<br>
+                [seq[:i]],<br>
+                maxlen=MAX_LEN,<br>
+                padding="post"<br>
+            )[0]<br>
+<br>
+            X_img.append(feature)<br>
+            X_seq.append(input_seq)<br>
+            Y.append(seq[i])<br>
+<br>
+X_img = np.array(X_img, dtype=np.float32)<br>
+X_seq = np.array(X_seq, dtype=np.int32)<br>
+Y = np.array(Y, dtype=np.int32)<br>
+<br>
+print("Training samples:", len(Y))<br>
+<br>
+image_input = layers.Input(shape=(49, 2048))<br>
+caption_input = layers.Input(shape=(MAX_LEN,))<br>
+<br>
+image_features = layers.Dense(EMBED_DIM)(image_input)<br>
+<br>
+caption_embedding = layers.Embedding(<br>
+    vocab_size,<br>
+    EMBED_DIM<br>
+)(caption_input)<br>
+<br>
+attention = layers.MultiHeadAttention(<br>
+    num_heads=2,<br>
+    key_dim=64<br>
+)(caption_embedding, image_features)<br>
+<br>
+x = layers.Add()([caption_embedding, attention])<br>
+x = layers.LayerNormalization()(x)<br>
+x = layers.GlobalAveragePooling1D()(x)<br>
+<br>
+output = layers.Dense(vocab_size, activation="softmax")(x)<br>
+<br>
+model = Model([image_input, caption_input], output)<br>
+<br>
+model.compile(<br>
+    optimizer="adam",<br>
+    loss="sparse_categorical_crossentropy",<br>
+    metrics=["accuracy"]<br>
+)<br>
+<br>
+model.summary()<br>
+<br>
+model.fit(<br>
+    [X_img, X_seq],<br>
+    Y,<br>
+    batch_size=BATCH_SIZE,<br>
+    epochs=EPOCHS<br>
+)<br>
+<br>
+def generate_caption(img_name):<br>
+    feature = features[img_name]<br>
+    caption = ["startseq"]<br>
+<br>
+    for _ in range(MAX_LEN):<br>
+        seq = tokenizer.texts_to_sequences([" ".join(caption)])[0]<br>
+        seq = pad_sequences([seq], maxlen=MAX_LEN, padding="post")<br>
+<br>
+        pred = model.predict(<br>
+            [feature.reshape(1, 49, 2048), seq],<br>
+            verbose=0<br>
         )<br>
-👉 Click Deploy<br>
-
-6.	Add IAM inline policy: <br>
-{
-  "Effect": "Allow",<br>
-  "Action": "dynamodb:PutItem",<br>
-  "Resource": "*"<br>
-}
 <br>
-7.	Upload file to S3 → Check DynamoDB <br>
-
-🧪 EXPERIMENT 8: SNS + SQS + Lambda<br>
+        pred[0][0] = -1<br>
 <br>
-Part A (SNS Email)<br>
-1.	Open Amazon SNS → Create topic <br>
-2.	Create subscription → Email → Confirm <br>
-3.	Publish message <br>
-
-Part B (S3 → SNS)<br>
-1.	Create S3 bucket <br>
-2.	Create SNS topic <br>
-3.	Add S3 event notification → SNS <br>
-4.	Upload file → Email received <br>
+        word_id = np.argmax(pred)<br>
+        word = tokenizer.index_word.get(word_id, "")<br>
 <br>
-Part C (SQS)<br>
-1.	Open Amazon SQS → Create queue <br>
-2.	Send message → Receive message <br><br>
+        if word == "endseq" or word == "":<br>
+            break<br>
 <br>
-Part D (Full flow)<br>
-1.	Create SNS + SQS <br>
-2.	Subscribe SQS to SNS <br>
-3.	Add SQS policy: <br>
-{<br>
-  "Effect": "Allow",<br>
-  "Principal": {"Service": "sns.amazonaws.com"},<br>
-  "Action": "SQS:SendMessage",<br>
-  "Resource": "SQS ARN"<br>
+        caption.append(word)<br>
+<br>
+    return " ".join(caption[1:])<br>
+<br>
+test_img = list(features.keys())[0]<br>
+<br>
+print("Test Image:", test_img)<br>
+print("Generated Caption:")<br>
+print(generate_caption(test_img))<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Experiment-5- Seq-to-seq<br>
+<br>
+import numpy as np<br>
+import pandas as pd<br>
+import re<br>
+import tensorflow as tf<br>
+from tensorflow.keras.preprocessing.text import Tokenizer<br>
+from tensorflow.keras.preprocessing.sequence import pad_sequences<br>
+from tensorflow.keras.layers import Input, LSTM, Embedding, Dense<br>
+from tensorflow.keras.layers import AdditiveAttention, Concatenate<br>
+from tensorflow.keras.models import Model<br>
+<br>
+# LOAD DATA<br>
+data = pd.read_csv("custom_summarization_dataset.csv")<br>
+<br>
+texts = data["text"]<br>
+summaries = data["summary"]<br>
+<br>
+# CLEAN TEXT<br>
+def clean_text(text):<br>
+    text = text.lower()<br>
+    text = re.sub(r"[^a-zA-Z ]", "", text)<br>
+    return text<br>
+<br>
+texts = texts.apply(clean_text)<br>
+summaries = summaries.apply(clean_text)<br>
+<br>
+# ADD START AND END TOKENS<br>
+summaries = summaries.apply(lambda x: "startseq " + x + " endseq")<br>
+<br>
+# TOKENIZATION<br>
+tokenizer = Tokenizer()<br>
+tokenizer.fit_on_texts(texts.tolist() + summaries.tolist())<br>
+<br>
+vocab_size = len(tokenizer.word_index) + 1<br>
+<br>
+text_seq = tokenizer.texts_to_sequences(texts)<br>
+summary_seq = tokenizer.texts_to_sequences(summaries)<br>
+<br>
+max_text_len = 100<br>
+max_summary_len = 20<br>
+<br>
+encoder_input = pad_sequences(text_seq, maxlen=max_text_len, padding="post")<br>
+decoder_input = pad_sequences(summary_seq, maxlen=max_summary_len, padding="post")<br>
+<br>
+decoder_target = np.zeros_like(decoder_input)<br>
+decoder_target[:, :-1] = decoder_input[:, 1:]<br>
+decoder_target = np.expand_dims(decoder_target, -1)<br>
+<br>
+# ENCODER<br>
+encoder_inputs = Input(shape=(max_text_len,))<br>
+enc_emb = Embedding(vocab_size, 128)(encoder_inputs)<br>
+<br>
+encoder_outputs, state_h, state_c = LSTM(<br>
+    128,<br>
+    return_sequences=True,<br>
+    return_state=True<br>
+)(enc_emb)<br>
+<br>
+# DECODER<br>
+decoder_inputs = Input(shape=(max_summary_len,))<br>
+dec_emb = Embedding(vocab_size, 128)(decoder_inputs)<br>
+<br>
+decoder_outputs, _, _ = LSTM(<br>
+    128,<br>
+    return_sequences=True,<br>
+    return_state=True<br>
+)(dec_emb, initial_state=[state_h, state_c])<br>
+<br>
+# ATTENTION<br>
+attention = AdditiveAttention()<br>
+attention_output = attention([decoder_outputs, encoder_outputs])<br>
+<br>
+concat = Concatenate(axis=-1)([decoder_outputs, attention_output])<br>
+<br>
+# OUTPUT<br>
+outputs = Dense(vocab_size, activation="softmax")(concat)<br>
+<br>
+# MODEL<br>
+model = Model([encoder_inputs, decoder_inputs], outputs)<br>
+<br>
+model.compile(<br>
+    optimizer="adam",<br>
+    loss="sparse_categorical_crossentropy",<br>
+    metrics=["accuracy"]<br>
+)<br>
+<br>
+# TRAIN<br>
+model.fit(<br>
+    [encoder_input, decoder_input],<br>
+    decoder_target,<br>
+    epochs=50,<br>
+    batch_size=16,<br>
+    validation_split=0.2<br>
+)<br>
+<br>
+# TEST SUMMARY<br>
+test_text = """<br>
+Artificial intelligence is a branch of computer science<br>
+that focuses on building smart machines.<br>
+"""<br>
+<br>
+test_text = clean_text(test_text)<br>
+<br>
+seq = tokenizer.texts_to_sequences([test_text])<br>
+seq = pad_sequences(seq, maxlen=max_text_len, padding="post")<br>
+<br>
+summary_seq = [tokenizer.word_index["startseq"]]<br>
+<br>
+reverse_word_index = tokenizer.index_word<br>
+<br>
+generated_summary = []<br>
+used_words = set()<br>
+<br>
+for i in range(max_summary_len):<br>
+<br>
+    dec_input = pad_sequences(<br>
+        [summary_seq],<br>
+        maxlen=max_summary_len,<br>
+        padding="post"<br>
+    )<br>
+<br>
+    pred = model.predict([seq, dec_input], verbose=0)<br>
+<br>
+    preds_step = pred[0, i, :]<br>
+<br>
+    preds_step[0] = -1   # ignore padding<br>
+<br>
+    # avoid repeated words<br>
+    for word in used_words:<br>
+        word_id = tokenizer.word_index.get(word)<br>
+        if word_id is not None:<br>
+            preds_step[word_id] = -1<br>
+<br>
+    next_word_id = np.argmax(preds_step)<br>
+    word = reverse_word_index.get(next_word_id, "")<br>
+<br>
+    if word == "endseq" or word == "":<br>
+        break<br>
+<br>
+    if word != "startseq":<br>
+        generated_summary.append(word)<br>
+        used_words.add(word)<br>
+<br>
+    summary_seq.append(next_word_id)<br>
+<br>
+print("Generated Summary:")<br>
+print(" ".join(generated_summary))<br>
+<br>
+<br>
+<br>
+<br>
+Experiment-6- text classification(T5)<br>
+<br>
+import numpy as np<br>
+import tensorflow as tf<br>
+from transformers import TFT5ForConditionalGeneration, AutoTokenizer<br>
+from datasets import load_dataset<br>
+from sklearn.metrics import accuracy_score, f1_score<br>
+<br>
+# Load dataset<br>
+dataset = load_dataset("imdb")<br>
+<br>
+train_data = dataset["train"].shuffle(seed=42).select(range(2000))<br>
+test_data = dataset["test"].shuffle(seed=42).select(range(500))<br>
+<br>
+model_name = "t5-small"<br>
+tokenizer = AutoTokenizer.from_pretrained(model_name)<br>
+<br>
+# Convert labels to text<br>
+def label_to_text(label):<br>
+    return "positive" if label == 1 else "negative"<br>
+<br>
+# Preprocess<br>
+def preprocess(example):<br>
+    input_text = "classify sentiment: " + example["text"]<br>
+    target_text = label_to_text(example["label"])<br>
+<br>
+    model_inputs = tokenizer(<br>
+        input_text,<br>
+        max_length=128,<br>
+        truncation=True,<br>
+        padding="max_length"<br>
+    )<br>
+<br>
+    labels = tokenizer(<br>
+        target_text,<br>
+        max_length=4,<br>
+        truncation=True,<br>
+        padding="max_length"<br>
+    )<br>
+<br>
+    model_inputs["labels"] = labels["input_ids"]<br>
+    return model_inputs<br>
+<br>
+train_dataset = train_data.map(preprocess)<br>
+test_dataset = test_data.map(preprocess)<br>
+<br>
+columns = ["input_ids", "attention_mask", "labels"]<br>
+<br>
+train_tf = train_dataset.to_tf_dataset(<br>
+    columns=columns,<br>
+    shuffle=True,<br>
+    batch_size=8<br>
+)<br>
+<br>
+test_tf = test_dataset.to_tf_dataset(<br>
+    columns=columns,<br>
+    shuffle=False,<br>
+    batch_size=8<br>
+)<br>
+<br>
+# Load T5 model<br>
+model = TFAutoModelForSeq2SeqLM.from_pretrained(model_name)<br>
+<br>
+# Compile<br>
+optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5)<br>
+<br>
+model.compile(optimizer=optimizer)<br>
+<br>
+# Train<br>
+model.fit(train_tf, epochs=3)<br>
+<br>
+# Predict<br>
+predicted_labels = []<br>
+true_labels = []<br>
+<br>
+for batch in test_tf:<br>
+    outputs = model.generate(<br>
+        input_ids=batch["input_ids"],<br>
+        attention_mask=batch["attention_mask"],<br>
+        max_length=4<br>
+    )<br>
+<br>
+    preds = tokenizer.batch_decode(outputs, skip_special_tokens=True)<br>
+    labels = tokenizer.batch_decode(batch["labels"], skip_special_tokens=True)<br>
+<br>
+    predicted_labels.extend(preds)<br>
+    true_labels.extend(labels)<br>
+<br>
+# Convert text predictions to numbers<br>
+y_pred = [1 if p.strip().lower() == "positive" else 0 for p in predicted_labels]<br>
+y_true = [1 if t.strip().lower() == "positive" else 0 for t in true_labels]<br>
+<br>
+# Evaluation<br>
+print("Accuracy:", accuracy_score(y_true, y_pred))<br>
+print("F1 Score:", f1_score(y_true, y_pred))<br>
+<br>
+# Test on unseen text<br>
+sample_text = "The movie was amazing and I really enjoyed it."<br>
+<br>
+input_text = "classify sentiment: " + sample_text<br>
+<br>
+inputs = tokenizer(<br>
+    input_text,<br>
+    return_tensors="tf",<br>
+    max_length=128,<br>
+    truncation=True,<br>
+    padding="max_length"<br>
+)<br>
+<br>
+output = model.generate(<br>
+    input_ids=inputs["input_ids"],<br>
+    attention_mask=inputs["attention_mask"],<br>
+    max_length=4<br>
+)<br>
+<br>
+prediction = tokenizer.decode(output[0], skip_special_tokens=True)<br>
+<br>
+print("Input Text:", sample_text)<br>
+print("Predicted Sentiment:", prediction)<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Experiment-7-Captioning<br>
+<br>
+import os<br>
+import re<br>
+import numpy as np<br>
+import pandas as pd<br>
+import matplotlib.pyplot as plt<br>
+from PIL import Image<br>
+<br>
+import tensorflow as tf<br>
+from tensorflow.keras import layers, Model<br>
+from tensorflow.keras.applications import ResNet50<br>
+from tensorflow.keras.applications.resnet50 import preprocess_input<br>
+from tensorflow.keras.preprocessing.image import load_img, img_to_array<br>
+from tensorflow.keras.preprocessing.text import Tokenizer<br>
+from tensorflow.keras.preprocessing.sequence import pad_sequences<br>
+<br>
+IMAGE_DIR = "Images"<br>
+CAPTION_FILE = "captions.txt"<br>
+<br>
+MAX_IMAGES = 500<br>
+MAX_LEN = 25<br>
+VOCAB_SIZE = 3000<br>
+EMBED_DIM = 128<br>
+LSTM_UNITS = 256<br>
+BATCH_SIZE = 64<br>
+EPOCHS = 5<br>
+IMG_SIZE = (224, 224)<br>
+<br>
+df = pd.read_csv(CAPTION_FILE)<br>
+<br>
+def clean_caption(text):<br>
+    text = text.lower()<br>
+    text = re.sub(r"[^a-z\s]", "", text)<br>
+    text = re.sub(r"\s+", " ", text).strip()<br>
+    return "startseq " + text + " endseq"<br>
+<br>
+captions = {}<br>
+<br>
+for _, row in df.iterrows():<br>
+    img = row["image"]<br>
+    cap = clean_caption(row["caption"])<br>
+<br>
+    if len(captions) >= MAX_IMAGES and img not in captions:<br>
+        continue<br>
+<br>
+    captions.setdefault(img, []).append(cap)<br>
+<br>
+all_captions = []<br>
+for caps in captions.values():<br>
+    all_captions.extend(caps)<br>
+<br>
+tokenizer = Tokenizer(num_words=VOCAB_SIZE, oov_token="<unk>")<br>
+tokenizer.fit_on_texts(all_captions)<br>
+<br>
+vocab_size = min(VOCAB_SIZE, len(tokenizer.word_index) + 1)<br>
+<br>
+print("Total images:", len(captions))<br>
+print("Vocabulary size:", vocab_size)<br>
+<br>
+base_model = ResNet50(weights="imagenet", include_top=False, input_shape=(224, 224, 3))<br>
+base_model.trainable = False<br>
+<br>
+x = layers.GlobalAveragePooling2D()(base_model.output)<br>
+feature_extractor = Model(base_model.input, x)<br>
+<br>
+def extract_features(image_name):<br>
+    path = os.path.join(IMAGE_DIR, image_name)<br>
+    img = load_img(path, target_size=IMG_SIZE)<br>
+    img = img_to_array(img)<br>
+    img = np.expand_dims(img, axis=0)<br>
+    img = preprocess_input(img)<br>
+    feature = feature_extractor.predict(img, verbose=0)<br>
+    return feature[0]<br>
+<br>
+features = {}<br>
+<br>
+for img_name in captions.keys():<br>
+    try:<br>
+        features[img_name] = extract_features(img_name)<br>
+    except:<br>
+        print("Skipped:", img_name)<br>
+<br>
+print("Extracted features:", len(features))<br>
+<br>
+X_img = []<br>
+X_seq = []<br>
+y = []<br>
+<br>
+for img_name, caps in captions.items():<br>
+    if img_name not in features:<br>
+        continue<br>
+<br>
+    feature = features[img_name]<br>
+<br>
+    for cap in caps:<br>
+        seq = tokenizer.texts_to_sequences([cap])[0]<br>
+<br>
+        for i in range(1, len(seq)):<br>
+            in_seq = seq[:i]<br>
+            out_word = seq[i]<br>
+<br>
+            in_seq = pad_sequences([in_seq], maxlen=MAX_LEN)[0]<br>
+<br>
+            X_img.append(feature)<br>
+            X_seq.append(in_seq)<br>
+            y.append(out_word)<br>
+<br>
+X_img = np.array(X_img)<br>
+X_seq = np.array(X_seq)<br>
+y = np.array(y)<br>
+<br>
+print("Training samples:", len(y))<br>
+<br>
+image_input = layers.Input(shape=(2048,))<br>
+image_dense = layers.Dense(EMBED_DIM, activation="relu")(image_input)<br>
+image_repeat = layers.RepeatVector(MAX_LEN)(image_dense)<br>
+<br>
+caption_input = layers.Input(shape=(MAX_LEN,))<br>
+caption_embed = layers.Embedding(vocab_size, EMBED_DIM, mask_zero=True)(caption_input)<br>
+<br>
+merged = layers.Add()([image_repeat, caption_embed])<br>
+lstm = layers.LSTM(LSTM_UNITS)(merged)<br>
+dense = layers.Dense(256, activation="relu")(lstm)<br>
+output = layers.Dense(vocab_size, activation="softmax")(dense)<br>
+<br>
+model = Model(inputs=[image_input, caption_input], outputs=output)<br>
+<br>
+model.compile(<br>
+    optimizer="adam",<br>
+    loss="sparse_categorical_crossentropy",<br>
+    metrics=["accuracy"]<br>
+)<br>
+<br>
+model.summary()<br>
+<br>
+history = model.fit(<br>
+    [X_img, X_seq],<br>
+    y,<br>
+    batch_size=BATCH_SIZE,<br>
+    epochs=EPOCHS,<br>
+    validation_split=0.1<br>
+)<br>
+<br>
+def word_for_id(word_id):<br>
+    return tokenizer.index_word.get(word_id, None)<br>
+<br>
+def generate_caption(image_name):<br>
+    feature = features[image_name]<br>
+    caption = "startseq"<br>
+<br>
+    for _ in range(MAX_LEN):<br>
+        seq = tokenizer.texts_to_sequences([caption])[0]<br>
+        seq = pad_sequences([seq], maxlen=MAX_LEN)<br>
+<br>
+        pred = model.predict([np.array([feature]), seq], verbose=0)<br>
+        pred_id = np.argmax(pred)<br>
+<br>
+        word = word_for_id(pred_id)<br>
+<br>
+        if word is None:<br>
+            break<br>
+<br>
+        caption += " " + word<br>
+<br>
+        if word == "endseq":<br>
+            break<br>
+<br>
+    caption = caption.replace("startseq", "").replace("endseq", "").strip()<br>
+    return caption<br>
+<br>
+sample_images = list(features.keys())[:5]<br>
+<br>
+plt.figure(figsize=(15, 10))<br>
+<br>
+for i, img_name in enumerate(sample_images):<br>
+    img_path = os.path.join(IMAGE_DIR, img_name)<br>
+    img = Image.open(img_path)<br>
+<br>
+    pred_caption = generate_caption(img_name)<br>
+<br>
+    plt.subplot(1, 5, i + 1)<br>
+    plt.imshow(img)<br>
+    plt.axis("off")<br>
+    plt.title(pred_caption, fontsize=9)<br>
+<br>
+plt.show()<br>
+<br>
+plt.plot(history.history["loss"], label="Training Loss")<br>
+plt.plot(history.history["val_loss"], label="Validation Loss")<br>
+plt.xlabel("Epoch")<br>
+plt.ylabel("Loss")<br>
+plt.legend()<br>
+plt.show()<br>
+<br>
+model.save("resnet50_lstm_caption_model.h5")<br>
+print("Model saved successfully")<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Expeiment-8 -BERT text summarizer<br>
+<br>
+<br>
+import pandas as pd<br>
+import torch<br>
+from torch.utils.data import Dataset, DataLoader<br>
+from transformers import BertTokenizer, EncoderDecoderModel<br>
+<br>
+# ==============================<br>
+# CONFIG<br>
+# ==============================<br>
+<br>
+DATASET_PATH = "text_summary_dataset.csv"<br>
+<br>
+MAX_INPUT_LEN = 256<br>
+MAX_SUMMARY_LEN = 64<br>
+BATCH_SIZE = 2<br>
+EPOCHS = 3<br>
+LR = 5e-5<br>
+<br>
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")<br>
+print("Using device:", DEVICE)<br>
+<br>
+# ==============================<br>
+# LOAD DATASET<br>
+# ==============================<br>
+<br>
+data = pd.read_csv(DATASET_PATH)<br>
+data = data.dropna()<br>
+<br>
+texts = data["text"].astype(str).tolist()[:500]<br>
+summaries = data["summary"].astype(str).tolist()[:500]<br>
+<br>
+print("Total samples:", len(texts))<br>
+<br>
+# ==============================<br>
+# LOAD TOKENIZER AND MODEL<br>
+# ==============================<br>
+<br>
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")<br>
+<br>
+model = EncoderDecoderModel.from_encoder_decoder_pretrained(<br>
+    "bert-base-uncased",<br>
+    "bert-base-uncased"<br>
+)<br>
+<br>
+model.config.decoder_start_token_id = tokenizer.cls_token_id<br>
+model.config.eos_token_id = tokenizer.sep_token_id<br>
+model.config.pad_token_id = tokenizer.pad_token_id<br>
+model.config.vocab_size = model.config.decoder.vocab_size<br>
+<br>
+model.config.max_length = MAX_SUMMARY_LEN<br>
+model.config.min_length = 5<br>
+model.config.no_repeat_ngram_size = 2<br>
+model.config.early_stopping = True<br>
+model.config.length_penalty = 2.0<br>
+model.config.num_beams = 4<br>
+<br>
+model.to(DEVICE)<br>
+<br>
+# ==============================<br>
+# DATASET CLASS<br>
+# ==============================<br>
+<br>
+class SummaryDataset(Dataset):<br>
+    def __init__(self, texts, summaries, tokenizer):<br>
+        self.texts = texts<br>
+        self.summaries = summaries<br>
+        self.tokenizer = tokenizer<br>
+<br>
+    def __len__(self):<br>
+        return len(self.texts)<br>
+<br>
+    def __getitem__(self, idx):<br>
+        input_enc = self.tokenizer(<br>
+            self.texts[idx],<br>
+            max_length=MAX_INPUT_LEN,<br>
+            padding="max_length",<br>
+            truncation=True,<br>
+            return_tensors="pt"<br>
+        )<br>
+<br>
+        target_enc = self.tokenizer(<br>
+            self.summaries[idx],<br>
+            max_length=MAX_SUMMARY_LEN,<br>
+            padding="max_length",<br>
+            truncation=True,<br>
+            return_tensors="pt"<br>
+        )<br>
+<br>
+        labels = target_enc["input_ids"].squeeze()<br>
+        labels[labels == tokenizer.pad_token_id] = -100<br>
+<br>
+        return {<br>
+            "input_ids": input_enc["input_ids"].squeeze(),<br>
+            "attention_mask": input_enc["attention_mask"].squeeze(),<br>
+            "labels": labels<br>
+        }<br>
+<br>
+dataset = SummaryDataset(texts, summaries, tokenizer)<br>
+<br>
+dataloader = DataLoader(<br>
+    dataset,<br>
+    batch_size=BATCH_SIZE,<br>
+    shuffle=True<br>
+)<br>
+<br>
+# ==============================<br>
+# TRAINING<br>
+# ==============================<br>
+<br>
+optimizer = torch.optim.AdamW(model.parameters(), lr=LR)<br>
+<br>
+model.train()<br>
+<br>
+for epoch in range(EPOCHS):<br>
+    total_loss = 0<br>
+<br>
+    for batch in dataloader:<br>
+        input_ids = batch["input_ids"].to(DEVICE)<br>
+        attention_mask = batch["attention_mask"].to(DEVICE)<br>
+        labels = batch["labels"].to(DEVICE)<br>
+<br>
+        outputs = model(<br>
+            input_ids=input_ids,<br>
+            attention_mask=attention_mask,<br>
+            labels=labels<br>
+        )<br>
+<br>
+        loss = outputs.loss<br>
+<br>
+        optimizer.zero_grad()<br>
+        loss.backward()<br>
+        optimizer.step()<br>
+<br>
+        total_loss += loss.item()<br>
+<br>
+    avg_loss = total_loss / len(dataloader)<br>
+    print(f"Epoch {epoch + 1}/{EPOCHS} - Loss: {avg_loss:.4f}")<br>
+<br>
+# ==============================<br>
+# SUMMARIZATION FUNCTION<br>
+# ==============================<br>
+<br>
+def summarize_text(text):<br>
+    model.eval()<br>
+<br>
+    inputs = tokenizer(<br>
+        text,<br>
+        max_length=MAX_INPUT_LEN,<br>
+        padding="max_length",<br>
+        truncation=True,<br>
+        return_tensors="pt"<br>
+    )<br>
+<br>
+    input_ids = inputs["input_ids"].to(DEVICE)<br>
+    attention_mask = inputs["attention_mask"].to(DEVICE)<br>
+<br>
+    with torch.no_grad():<br>
+        summary_ids = model.generate(<br>
+            input_ids=input_ids,<br>
+            attention_mask=attention_mask,<br>
+            max_length=MAX_SUMMARY_LEN,<br>
+            min_length=5,<br>
+            num_beams=4,<br>
+            no_repeat_ngram_size=2,<br>
+            length_penalty=2.0,<br>
+            early_stopping=True<br>
+        )<br>
+<br>
+    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)<br>
+    return summary<br>
+<br>
+# ==============================<br>
+# TEST<br>
+# ==============================<br>
+<br>
+test_text = """<br>
+Artificial intelligence is transforming healthcare by improving diagnosis,<br>
+treatment planning, patient monitoring, and medical research. AI systems can<br>
+analyze large amounts of medical data quickly and help doctors make better<br>
+decisions.<br>
+"""<br>
+<br>
+generated_summary = summarize_text(test_text)<br>
+<br>
+print("\nInput Text:")<br>
+print(test_text)<br>
+<br>
+print("\nGenerated Summary:")<br>
+print(generated_summary)<br>
+<br>
+# ==============================<br>
+# SAVE MODEL<br>
+# ==============================<br>
+<br>
+model.save_pretrained("bert_summarization_model")<br>
+tokenizer.save_pretrained("bert_summarization_model")<br>
+<br>
+print("\nModel saved successfully.")<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Experiment-9 -Multimodal<br>
+<br>
+<br>
+import os<br>
+import numpy as np<br>
+import tensorflow as tf<br>
+from tensorflow.keras import layers, Model<br>
+from tensorflow.keras.applications import ResNet50<br>
+from tensorflow.keras.applications.resnet50 import preprocess_input<br>
+from tensorflow.keras.preprocessing.text import Tokenizer<br>
+from tensorflow.keras.preprocessing.sequence import pad_sequences<br>
+<br>
+# Load dataset<br>
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()<br>
+<br>
+class_names = [<br>
+    "t-shirt", "trouser", "pullover", "dress", "coat",<br>
+    "sandal", "shirt", "sneaker", "bag", "ankle boot"<br>
+]<br>
+<br>
+# Take small data for fast training<br>
+TRAIN_SAMPLES = 5000<br>
+TEST_SAMPLES = 1000<br>
+<br>
+x_train = x_train[:TRAIN_SAMPLES]<br>
+y_train = y_train[:TRAIN_SAMPLES]<br>
+x_test = x_test[:TEST_SAMPLES]<br>
+y_test = y_test[:TEST_SAMPLES]<br>
+<br>
+# Convert grayscale images to RGB<br>
+x_train = np.repeat(x_train[..., np.newaxis], 3, axis=-1)<br>
+x_test = np.repeat(x_test[..., np.newaxis], 3, axis=-1)<br>
+<br>
+# Create text descriptions<br>
+def create_texts(labels):<br>
+    texts = []<br>
+    for label in labels:<br>
+        texts.append("This image contains a " + class_names[int(label)])<br>
+    return texts<br>
+<br>
+train_texts = create_texts(y_train)<br>
+test_texts = create_texts(y_test)<br>
+<br>
+# Tokenize text<br>
+MAX_WORDS = 10000<br>
+MAX_LEN = 10<br>
+<br>
+tokenizer = Tokenizer(num_words=MAX_WORDS, oov_token="<OOV>")<br>
+tokenizer.fit_on_texts(train_texts)<br>
+<br>
+x_train_text = tokenizer.texts_to_sequences(train_texts)<br>
+x_test_text = tokenizer.texts_to_sequences(test_texts)<br>
+<br>
+x_train_text = pad_sequences(x_train_text, maxlen=MAX_LEN, padding="post")<br>
+x_test_text = pad_sequences(x_test_text, maxlen=MAX_LEN, padding="post")<br>
+<br>
+# Image input<br>
+image_input = layers.Input(shape=(28, 28, 3), name="image_input")<br>
+<br>
+x_img = layers.Resizing(224, 224)(image_input)<br>
+x_img = layers.Lambda(lambda x: preprocess_input(tf.cast(x, tf.float32)))(x_img)<br>
+<br>
+resnet = ResNet50(<br>
+    weights="imagenet",<br>
+    include_top=False,<br>
+    input_shape=(224, 224, 3)<br>
+)<br>
+<br>
+resnet.trainable = False<br>
+<br>
+x_img = resnet(x_img, training=False)<br>
+x_img = layers.GlobalAveragePooling2D()(x_img)<br>
+x_img = layers.Dense(256, activation="relu")(x_img)<br>
+x_img = layers.Dropout(0.3)(x_img)<br>
+<br>
+# Text input<br>
+text_input = layers.Input(shape=(MAX_LEN,), name="text_input")<br>
+<br>
+x_txt = layers.Embedding(input_dim=MAX_WORDS, output_dim=128)(text_input)<br>
+x_txt = layers.LSTM(128)(x_txt)<br>
+x_txt = layers.Dense(128, activation="relu")(x_txt)<br>
+x_txt = layers.Dropout(0.3)(x_txt)<br>
+<br>
+# Combine image and text features<br>
+combined = layers.Concatenate()([x_img, x_txt])<br>
+combined = layers.Dense(256, activation="relu")(combined)<br>
+combined = layers.Dropout(0.4)(combined)<br>
+<br>
+output = layers.Dense(10, activation="softmax")(combined)<br>
+<br>
+model = Model(inputs=[image_input, text_input], outputs=output)<br>
+<br>
+# Compile model<br>
+model.compile(<br>
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),<br>
+    loss="sparse_categorical_crossentropy",<br>
+    metrics=["accuracy"]<br>
+)<br>
+<br>
+model.summary()<br>
+<br>
+# Normal input format<br>
+train_inputs = {<br>
+    "image_input": x_train,<br>
+    "text_input": x_train_text<br>
 }<br>
 <br>
-4.	Create Lambda → Add SQS trigger <br>
-in role permissions add this code :<br>
-{<br>
-  "Version": "2012-10-17",<br>
-  "Statement": [<br>
-    {<br>
-      "Effect": "Allow",<br>
-      "Action": [<br>
-        "sqs:ReceiveMessage",<br>
-        "sqs:DeleteMessage",<br>
-        "sqs:GetQueueAttributes"<br>
-      ],<br>
-      "Resource": "*"<br>
-    }<br>
-  ]<br>
+test_inputs = {<br>
+    "image_input": x_test,<br>
+    "text_input": x_test_text<br>
 }<br>
-5.	Add Lambda code: <br>
-def lambda_handler(event, context):<br>
-    for record in event['Records']:<br>
-        print(record['body'])<br>
 <br>
--------Deploy<br>
+# Train model<br>
+history = model.fit(<br>
+    train_inputs,<br>
+    y_train,<br>
+    validation_data=(test_inputs, y_test),<br>
+    batch_size=16,<br>
+    epochs=2<br>
+)<br>
 <br>
-EXPERIMENT 9: EC2 + Load Balancer<br>
+# Evaluate model<br>
+test_loss, test_acc = model.evaluate(test_inputs, y_test)<br>
 <br>
-1.	Open Amazon EC2 → Launch instance <br>
-2.	Connect → Run: <br>
-sudo su<br>
-yum update -y<br>
-yum install httpd -y<br>
-systemctl start httpd<br>
-systemctl enable httpd<br>
-echo "This is Server 1" > /var/www/html/index.html<br>
-________________________________________<br>
-3.	Create Load Balancer → Target group → Add instance <br>
-4.	Fix AZ if needed → Open DNS <br>
-________________________________________<br>
- EXPERIMENT 10: Elastic Beanstalk<br>
-________________________________________<br>
-1.	Open AWS Elastic Beanstalk <br>
-2.	Create environment <br>
-3.	Platform → Python <br>
-4.	Sample application <br>
-5.	Select existing role <br>
-6.	Next → Next → Create <br>
-7.	Open URL <br>
-________________________________________<br>
- EXPERIMENT 11: Amazon Lex<br>
-________________________________________<br>
-1.	Open Amazon Lex → Create bot <br>
-2.	Create intent → BookHotel <br>
-3.	Add utterances: <br>
-•	Book a room <br>
-•	I need a hotel <br>
-4.	Add slots: <br>
-•	location → AMAZON.City <br>
-•	checkindate → AMAZON.Date <br>
-5.	Add prompts <br>
-6.	Build → Test <br>
+print("Test Loss:", test_loss)<br>
+print("Test Accuracy:", test_acc)<br>
 <br>
- EXPERIMENT 12: IAM User<br>
+# Predictions<br>
+pred_probs = model.predict(test_inputs)<br>
+pred_classes = np.argmax(pred_probs, axis=1)<br>
 <br>
-1.	Open AWS IAM → Users <br>
-2.	Create user → S3_Specialist <br>
-3.	Enable console access <br>
-4.	Attach policy:<br>
- AmazonS3FullAccess <br>
-5.	Login → Test <br>
+print("\nSample Predictions:")<br>
 <br>
- EXPERIMENT 13: IAM Role (EC2 → S3)<br>
+for i in range(10):<br>
+    print("True:", class_names[y_test[i]], "| Predicted:", class_names[pred_classes[i]])<br>
 <br>
-1.	IAM → Roles → Create role → EC2 <br>
-2.	Attach:<br>
- AmazonS3FullAccess <br>
-3.	EC2 → Attach role <br>
-4.	Connect → Run: <br>
-aws s3 ls<br>
 <br>
-5.	(Optional) <br>
-aws s3 mb s3://my-test-bucket-12345<br>
 <br>
-
-
 <br>
-Experiment-7<br>
-EXPERIMENT 7 — Lambda + S3 + DynamoDB <br>
-Create S3 Bucket <br>
-
-Go to S3 <br>
-Click Create bucket <br>
-
-Select: <br>
-
-General purpose
-
-Bucket name: <br>
-
-my-lambda-bucket
-
-Enable Versioning <br>
-
-Click Create bucket <br>
-
-Create DynamoDB Table <br>
-
-Search DynamoDB <br>
-Click Create table <br>
-
-Table name: <br>
-
-newtable
-
-Partition key: <br>
-
-unique
-Type → String
-
-Click Create table <br>
-
-Create Lambda Function <br>
-
-Search Lambda <br>
-Click Create function <br>
-
-Select: <br>
-
-Author from scratch
-
-Function name: <br>
-
-s3-trigger-function
-
-Runtime: <br>
-
-Python 3.x
-
-Permissions: <br>
-
-Use existing role: <br>
-
-LabRole
-
-OR <br>
-
-Create new role with basic Lambda permissions
-
-Click Create function <br>
-
-Add S3 Trigger <br>
-
-Inside Lambda function <br>
-
-Click Add trigger <br>
-
-Select: <br>
-
-S3
-
-Choose bucket: <br>
-
-my-lambda-bucket
-
-Event type: <br>
-
-All object create events
-
-Tick acknowledge <br>
-
-Click Add <br>
-
-Add Lambda Code <br>
-
-Delete default code <br>
-
-Paste this code: <br>
-
-import boto3
-from uuid import uuid4
-
-def lambda_handler(event, context):
-
-    s3 = boto3.client("s3")
-    dynamodb = boto3.resource('dynamodb')
-
-    if 'Records' in event:
-
-        for record in event['Records']:
-
-            bucket_name = record['s3']['bucket']['name']
-            object_key = record['s3']['object']['key']
-            size = record['s3']['object'].get('size', -1)
-            event_name = record.get('eventName', 'Unknown')
-            event_time = record.get('eventTime', 'Unknown')
-
-            dynamoTable = dynamodb.Table('newtable')
-
-            dynamoTable.put_item(
-                Item={
-                    'unique': str(uuid4()),
-                    'Bucket': bucket_name,
-                    'Object': object_key,
-                    'Size': size,
-                    'Event': event_name,
-                    'EventTime': event_time
-                }
-            )
-
-    else:
-        print("No Records key found")
-
-Click Deploy <br>
-
-✔ Lambda deployed <br>
-
-If Permission Error Comes <br>
-
-Go to IAM <br>
-Roles <br>
-
-Select Lambda Role <br>
-
-Click: <br>
-
-Add permissions → Create inline policy
-
-Go to JSON tab <br>
-
-Paste: <br>
-
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "dynamodb:PutItem",
-      "Resource": "arn:aws:dynamodb:*:*:table/newtable"
-    }
-  ]
-}
-
-Click Next <br>
-
-Policy name: <br>
-
-lambda-dynamo-policy
-
-Click Create policy <br>
-
-Test the Trigger <br>
-
-Go to S3 bucket <br>
-
-Upload any file <br>
-
-Example: <br>
-
-image.jpg
-test.pdf
-
-✔ Lambda automatically triggers <br>
-
-Verify in DynamoDB <br>
-
-Go to DynamoDB <br>
-
-Open table: <br>
-
-newtable
-
-Click: <br>
-
-Explore table items
-
-Click Run <br>
-
-✔ Uploaded file details visible <br>
-
-Monitor Using CloudWatch <br>
-
-Go to Lambda function <br>
-
-Monitor tab <br>
-
-Click: <br>
-
-View CloudWatch Logs
-
-Open latest log stream <br>
-
-✔ Lambda execution logs visible <br>
 <br>
-week:8 <br>
-SNS — Create Topic and Send Email <br>
-
-Go to SNS <br>
-Click Topics <br>
-Click Create topic <br>
-
-Select: <br>
-
-Standard
-
-Topic name: <br>
-
-MyEmailTopic
-
-Click Create topic <br>
-
-Create Email Subscription <br>
-
-Open created topic <br>
-
-Go to Subscriptions <br>
-
-Click Create subscription <br>
-
-Protocol: <br>
-
-Email
-
-Endpoint: <br>
-
-your-email@gmail.com
-
-Click Create subscription <br>
-
-Confirm Subscription <br>
-
-Open email inbox <br>
-
-Open AWS SNS mail <br>
-
-Click: <br>
-
-Confirm subscription
-
-✔ Email subscribed successfully <br>
-
-Publish Test Message <br>
-
-Open SNS topic <br>
-
-Click Publish message <br>
-
-Subject: <br>
-
-Test Mail
-
-Message body: <br>
-
-Hello this is SNS test
-
-Click Publish message <br>
-
-✔ Email notification received <br>
-
-S3 → SNS → Email Notification <br>
-Create S3 Bucket <br>
-
-Go to S3 <br>
-
-Click Create bucket <br>
-
-Bucket name: <br>
-
-my-upload-bucket-2026
-
-Select SAME region as SNS topic <br>
-
-Click Create bucket <br>
-
-Configure SNS Access Policy <br>
-
-Open SNS Topic <br>
-
-Go to Access Policy <br>
-
-Click Edit <br>
-
-Paste policy: <br>
-
-{
- "Version": "2012-10-17",
- "Statement": [
-  {
-   "Effect": "Allow",
-   "Principal": {
-    "Service": "s3.amazonaws.com"
-   },
-   "Action": "SNS:Publish",
-   "Resource": "SNS-TOPIC-ARN",
-   "Condition": {
-    "ArnLike": {
-     "aws:SourceArn": "S3-BUCKET-ARN"
-    }
-   }
-  }
- ]
-}
-
-Save changes <br>
-
-Configure S3 Event Notification <br>
-
-Open S3 bucket <br>
-
-Go to Properties <br>
-
-Scroll to: <br>
-
-Event notifications
-
-Click Create event notification <br>
-
-Event name: <br>
-
-UploadNotification
-
-Event type: <br>
-
-All object create events
-
-Destination: <br>
-
-SNS Topic
-
-Select topic <br>
-
-Click Save changes <br>
-
-Test S3 → SNS <br>
-
-Upload any file into S3 bucket <br>
-
-✔ SNS sends email notification automatically <br>
-
-SQS Queue Creation <br>
-
-Go to SQS <br>
-
-Click Create queue <br>
-
-Select: <br>
-
-Standard
-
-Queue name: <br>
-
-MyQueue
-
-Click Create queue <br>
-
-Send Message to SQS <br>
-
-Open queue <br>
-
-Click Send and receive messages <br>
-
-Message body: <br>
-
-Hello this is SQS test message
-
-Click Send message <br>
-
-Receive Message from SQS <br>
-
-Click: <br>
-
-Poll for messages
-
-✔ Message displayed <br>
-
-Optional: <br>
-
-Delete message
-S3 → SNS → SQS → Lambda Architecture <br>
-Create S3 Bucket <br>
-
-Bucket name: <br>
-
-mys3eventbucket123
-
-Click Create bucket <br>
-
-Create SNS Topic <br>
-
-Topic name: <br>
-
-MyS3SNSTopic
-
-Copy SNS Topic ARN <br>
-
-Create SQS Queue <br>
-
-Queue name: <br>
-
-MyS3Queue
-
-Copy Queue ARN <br>
-
-Subscribe SQS to SNS <br>
-
-Open SNS Topic <br>
-
-Click Create subscription <br>
-
-Protocol: <br>
-
-Amazon SQS
-
-Endpoint: <br>
-
-MyS3Queue
-
-Click Create subscription <br>
-
-Add SQS Access Policy <br>
-
-Open SQS Queue <br>
-
-Access Policy → Edit <br>
-
-Paste: <br>
-
-{
- "Statement": [
-  {
-   "Effect": "Allow",
-   "Principal": {
-    "Service": "sns.amazonaws.com"
-   },
-   "Action": "sqs:SendMessage",
-   "Resource": "SQS-ARN",
-   "Condition": {
-    "ArnEquals": {
-     "aws:SourceArn": "SNS-ARN"
-    }
-   }
-  }
- ]
-}
-
-Save <br>
-
-Configure SNS Access Policy <br>
-
-Open SNS Topic <br>
-
-Edit Access Policy <br>
-
-Paste: <br>
-
-{
- "Version": "2012-10-17",
- "Statement": [
-  {
-   "Effect": "Allow",
-   "Principal": {
-    "Service": "s3.amazonaws.com"
-   },
-   "Action": "SNS:Publish",
-   "Resource": "SNS-TOPIC-ARN",
-   "Condition": {
-    "ArnLike": {
-     "aws:SourceArn": "S3-BUCKET-ARN"
-    }
-   }
-  }
- ]
-}
-
-Save <br>
-
-Configure S3 Event Notification <br>
-
-Open S3 bucket <br>
-
-Properties → Event Notifications <br>
-
-Click Create event notification <br>
-
-Event name: <br>
-
-S3UploadEvent
-
-Event type: <br>
-
-All object create events
-
-Destination: <br>
-
-SNS Topic
-
-Select: <br>
-
-MyS3SNSTopic
-
-Save changes <br>
-
-Verify SQS Message <br>
-
-Upload file into S3 bucket <br>
-
-Go to SQS Queue <br>
-
-Click Poll for messages <br>
-
-✔ S3 event message visible <br>
-
-Create Lambda Consumer <br>
-
-Go to Lambda <br>
-
-Click Create function <br>
-
-Function name: <br>
-
-SQSConsumerFunction
-
-Runtime: <br>
-
-Python 3.x
-
-Select: <br>
-
-LabRole
-
-Click Create function <br>
-
-Add SQS Trigger <br>
-
-Inside Lambda <br>
-
-Click Add Trigger <br>
-
-Select: <br>
-
-SQS
-
-Choose queue: <br>
-
-MyS3Queue
-
-Click Add <br>
-
-Add Lambda Code <br>
-
-Paste: <br>
-
-def lambda_handler(event, context):
-
-    for record in event['Records']:
-
-        print("Message received from SQS:")
-        print(record['body'])
-
-    return {
-        'statusCode': 200,
-        'body': 'Message processed successfully'
-    }
-
-Click Deploy <br>
-
-Test Complete Architecture <br>
-
-Upload file into S3 bucket <br>
-
-Flow: <br>
-
-S3 → SNS → SQS → Lambda
-
-✔ Lambda automatically processes message <br>
-
-Verify Logs <br>
-
-Go to Lambda → Monitor <br>
-
-Click View CloudWatch Logs <br>
-
-✔ SQS messages visible in logs <br>
-week-9:<br>
-Elastic Load Balancer (ALB) + Auto Scaling <br>
-Launch EC2 Instance 1 <br>
-
-Go to EC2 <br>
-
-Click Launch Instance <br>
-
-Name: <br>
-
-webserver-1
-
-AMI: <br>
-
-Amazon Linux 2
-
-Instance type: <br>
-
-t2.micro
-
-Security Group inbound rules: <br>
-
-SSH → 22 → My IP
-HTTP → 80 → 0.0.0.0/0
-
-Launch instance <br>
-
-Configure Apache Server <br>
-
-Connect EC2 using SSH <br>
-
-Run: <br>
-
-sudo su
-yum update -y
-yum install httpd -y
-systemctl start httpd
-systemctl enable httpd
-echo "This is Server 1" > /var/www/html/index.html
-Launch EC2 Instance 2 <br>
-
-Launch another EC2 <br>
-
-Name: <br>
-
-webserver-2
-
-Use same configuration <br>
-
-Connect using SSH <br>
-
-Run: <br>
-
-sudo su
-yum update -y
-yum install httpd -y
-systemctl start httpd
-systemctl enable httpd
-echo "This is Server 2" > /var/www/html/index.html
-Create Load Balancer Security Group <br>
-
-Go to Security Groups <br>
-
-Click Create Security Group <br>
-
-Name: <br>
-
-lb-sg
-
-Inbound rules: <br>
-
-HTTP → 80 → Anywhere
-
-Click Create <br>
-
-Create Application Load Balancer <br>
-
-Go to EC2 → Load Balancers <br>
-
-Click Create Load Balancer <br>
-
-Select: <br>
-
-Application Load Balancer
-
-Name: <br>
-
-my-alb
-
-Scheme: <br>
-
-Internet-facing
-
-IP type: <br>
-
-IPv4
-
-Listener: <br>
-
-HTTP → 80
-Configure Network <br>
-
-Select default VPC <br>
-
-Select minimum 2 subnets <br>
-
-Choose: <br>
-
-lb-sg
-
-security group <br>
-
-Create Target Group <br>
-
-Create new target group <br>
-
-Name: <br>
-
-web-servers-tg
-
-Target type: <br>
-
-Instance
-
-Protocol: <br>
-
-HTTP
-
-Port: <br>
-
-80
-
-Health check path: <br>
-
-/
-
-Click Next <br>
-
-Register Targets <br>
-
-Select: <br>
-
-webserver-1
-webserver-2
-
-Click: <br>
-
-Include as pending
-
-Click Register targets <br>
-
-Click Create Load Balancer <br>
-
-Wait few minutes <br>
-
-✔ ALB created <br>
-
-Verify Load Balancer <br>
-
-Open Load Balancer <br>
-
-Copy DNS name <br>
-
-Paste in browser <br>
-
-✔ Displays: <br>
-
-This is Server 1
-
-Refresh page multiple times <br>
-
-✔ Displays: <br>
-
-This is Server 2
-
-Traffic distributed successfully <br>
-
-Verify Health Checks <br>
-
-Go to Target Groups <br>
-
-Open: <br>
-
-web-servers-tg
-
-Targets tab <br>
-
-✔ Both instances should show: <br>
-
-Healthy
-Create AMI from Existing EC2 <br>
-
-Go to EC2 → Instances <br>
-
-Select configured instance <br>
-
-Actions → Image and templates → Create image <br>
-
-AMI name: <br>
-
-my-webserver-ami
-
-Click Create Image <br>
-
-Wait until status becomes: <br>
-
-Available
-Create Launch Template <br>
-
-Go to EC2 → Launch Templates <br>
-
-Click Create Launch Template <br>
-
-Template name: <br>
-
-my-launch-template
-
-Select created AMI <br>
-
-Instance type: <br>
-
-t2.micro
-
-Select keypair <br>
-
-Select Security Group <br>
-
-Click Create Launch Template <br>
-
-Create Auto Scaling Group <br>
-
-Go to EC2 → Auto Scaling Groups <br>
-
-Click Create Auto Scaling Group <br>
-
-Name: <br>
-
-webserver-asg
-
-Select: <br>
-
-my-launch-template
-
-Click Next <br>
-
-Configure Network <br>
-
-Select VPC <br>
-
-Select all subnets <br>
-
-Enable: <br>
-
-Attach to existing Load Balancer
-
-Choose existing ALB <br>
-
-Health check type: <br>
-
-HTTP
-
-Grace period: <br>
-
-300
-
-Click Next <br>
-
-Configure Group Size <br>
-
-Desired capacity: <br>
-
-2
-
-Minimum capacity: <br>
-
-1
-
-Maximum capacity: <br>
-
-4
-
-Click Next <br>
-
-Click Create Auto Scaling Group <br>
-
-✔ ASG created <br>
-
-Verify Auto Scaling <br>
-
-Go to Auto Scaling Group <br>
-
-Instances tab <br>
-
-✔ Instances running automatically <br>
-
-Terminate one instance manually <br>
-
-✔ ASG launches new instance automatically <br>
-
-Test Load Balancer <br>
-
-Copy ALB DNS Name <br>
-
-Open in browser <br>
-
-Refresh multiple times <br>
-
-✔ Traffic distributed between servers <br>
-
-✔ Auto Scaling + Load Balancer working <br>
-week-10:
-Open Elastic Beanstalk <br>
-
-Login AWS Console <br>
-
-Search: <br>
-
-Elastic Beanstalk
-
-Click Create Application <br>
-
-Create Application <br>
-
-Application name: <br>
-
-MyApp
-
-Description optional <br>
-
-Click Create <br>
-
-Create Environment <br>
-
-Click: <br>
-
-Create Environment
-
-Select: <br>
-
-Web Server Environment
-
-Click Select <br>
-
-Configure Environment <br>
-
-Environment name: <br>
-
-myapp-env
-
-Choose Platform: <br>
-
-Java
-Python
-Node.js
-PHP
-
-(choose according to application) <br>
-
-Upload Application Code <br>
-
-Under Application Code <br>
-
-Select: <br>
-
-Upload your code
-
-Upload: <br>
-
-.war
-.zip
-.php
-
-file <br>
-
-Configure Service Access <br>
-
-Service Role: <br>
-
-LabRole
-
-EC2 Key Pair: <br>
-
-Optional
-
-EC2 Instance Profile: <br>
-
-LabInstanceProfile
-Configure Network <br>
-
-Select VPC <br>
-
-Select subnets <br>
-
-Enable: <br>
-
-Public IP
-Configure Instance and Scaling <br>
-
-Instance type: <br>
-
-t2.micro
-
-Minimum instances: <br>
-
-1
-
-Maximum instances: <br>
-
-2
-
-Enable Load Balancer <br>
-
-Create Environment <br>
-
-Click Review <br>
-
-Click Create <br>
-
-Wait few minutes <br>
-
-✔ Elastic Beanstalk automatically creates: <br>
-
-EC2
-Load Balancer
-Auto Scaling Group
-Security Groups
-Access Application <br>
-
-After deployment AWS provides URL <br>
-
-Example: <br>
-
-http://myapp-env.us-east-1.elasticbeanstalk.com
-
-Open URL in browser <br>
-
-✔ Application running successfully <br>
-
-Update Application <br>
-
-Open Environment <br>
-
-Click: <br>
-
-Upload and Deploy
-
-Upload new version <br>
-
-✔ Application updated <br>
-week-12:
-Login AWS Console as Root User <br>
-
-Search: <br>
-
-IAM
-
-Go to: <br>
-
-Users → Create User
-
-User name: <br>
-
-S3_Specialist
-
-Enable: <br>
-
-Provide user access to AWS Management Console
-
-Select: <br>
-
-Custom Password
-
-Click Next <br>
-
-Attach S3 Permission <br>
-
-Select: <br>
-
-Attach policies directly
-
-Search and select: <br>
-
-AmazonS3FullAccess
-
-Click Next → Create User <br>
-
-Download: <br>
-
-.csv file
-
-✔ IAM user created <br>
-
-Login Using IAM User <br>
-
-Copy Account ID <br>
-
-Sign out root account <br>
-
-Open IAM sign-in URL <br>
-
-Enter: <br>
-
-Account ID
-IAM Username
-Password
-
-Login successfully <br>
-
-Verify Permissions <br>
-
-Go to EC2 <br>
-
-✔ Access Denied shown <br>
-
-Go to S3 <br>
-
-✔ Bucket creation works <br>
-
-This proves user has only S3 access <br>
-
-Create Access Keys for CLI <br>
-
-Login as Admin/Root <br>
-
-Go to IAM → Users <br>
-
-Select created user <br>
-
-Go to: <br>
-
-Security Credentials
-
-Scroll to Access Keys <br>
-
-Click Create Access Key <br>
-
-Select: <br>
-
-Command Line Interface (CLI)
-
-Download CSV file <br>
-
-✔ Access Key ID and Secret Key generated <br>
-
-Install AWS CLI <br>
-
-Download AWS CLI from: <br>
-
-AWS CLI Installer
- <br>
-
-Install AWS CLI <br>
-
-Configure AWS CLI <br>
-
-Open CMD / Terminal <br>
-
-Run: <br>
-
-aws configure
-
-Enter: <br>
-
-Access Key ID
-Secret Access Key
-Region → ap-south-1
-Output → json
-
-✔ CLI configured <br>
-
-Verify CLI Access <br>
-
-Run: <br>
-
-aws ec2 describe-instances
-
-✔ AccessDenied shown <br>
-
-Run: <br>
-
-aws s3 ls
-
-✔ S3 buckets listed <br>
-
-Create bucket using CLI: <br>
-
-aws s3 mb s3://your-unique-bucket-name
-
-✔ Bucket created successfully <br>
-
-
-
-
-week-13:
-EXPERIMENT 13 — IAM ROLE FOR EC2 (KEYLESS ACCESS) <br>
-Create IAM Role <br>
-
-Login AWS Console <br>
-
-Search: <br>
-
-IAM
-
-Go to: <br>
-
-Roles → Create Role
-
-Trusted entity: <br>
-
-AWS Service
-
-Use case: <br>
-
-EC2
-
-Click Next <br>
-
-Attach Permission to Role <br>
-
-Search and select: <br>
-
-AmazonS3FullAccess
-
-Click Next <br>
-
-Role name: <br>
-
-EC2-S3-Role
-
-Click Create Role <br>
-
-✔ IAM Role created <br>
-
-Create EC2 Instance <br>
-
-Launch EC2 normally <br>
-
-Connect using SSH <br>
-
-Run: <br>
-
-aws ec2 describe-instances
-
-✔ Unauthorized shown initially <br>
-
-Because no role attached <br>
-
-Attach IAM Role to EC2 <br>
-
-Go to EC2 Console <br>
-
-Select running instance <br>
-
-Actions → Security → Modify IAM Role <br>
-
-Select: <br>
-
-EC2-S3-Role
-
-Click Update IAM Role <br>
-
-✔ Role attached successfully <br>
-
-Verify Role Access <br>
-
-Connect EC2 using SSH <br>
-
-Run: <br>
-
-aws s3 ls
-
-✔ S3 access works <br>
-
-Run: <br>
-
-aws ec2 describe-instances
-
-✔ Unauthorized still shown <br>
-
-Because role has only S3 access <br>
-
-No Access Key or Secret Key required <br>
-
-AWS automatically provides temporary credentials <br>
+<br>
+Experiment-10-XLNet<br>
+<br>
+<br>
+# Install only once if needed<br>
+# pip install bert-extractive-summarizer<br>
+# pip install transformers<br>
+# pip install pandas<br>
+<br>
+import pandas as pd<br>
+import warnings<br>
+from summarizer import TransformerSummarizer<br>
+<br>
+warnings.filterwarnings("ignore")<br>
+<br>
+# ==============================<br>
+# LOAD DATASET<br>
+# ==============================<br>
+<br>
+df = pd.read_csv("water_problem_nlp_en_for_Kaggle_100.csv", delimiter=";")<br>
+df = df.fillna("")<br>
+<br>
+df["text"] = df["text"].astype(str)<br>
+<br>
+# Use first 5 rows for simple experiment<br>
+df = df.head(5)<br>
+<br>
+print(df.info())<br>
+print(df["text"].head())<br>
+<br>
+# ==============================<br>
+# CREATE LONG TEXT BLOCKS<br>
+# ==============================<br>
+<br>
+max_length = 400<br>
+bodies = []<br>
+i = 0<br>
+<br>
+while i < len(df):<br>
+    body = ""<br>
+<br>
+    while len(body) < max_length and i < len(df):<br>
+        body += " " + df.loc[i, "text"]<br>
+        i += 1<br>
+<br>
+    bodies.append(body.strip())<br>
+<br>
+print("\nNumber of text blocks:", len(bodies))<br>
+<br>
+for idx, body in enumerate(bodies):<br>
+    print("\nBlock", idx + 1)<br>
+    print(body)<br>
+<br>
+# ==============================<br>
+# LOAD XLNet SUMMARIZER<br>
+# ==============================<br>
+<br>
+xlnet_model = TransformerSummarizer(<br>
+    transformer_type="XLNet",<br>
+    transformer_model_key="xlnet-base-cased"<br>
+)<br>
+<br>
+# ==============================<br>
+# GENERATE SUMMARIES<br>
+# ==============================<br>
+<br>
+xlnet_summaries = []<br>
+min_length_text = 40<br>
+<br>
+for body in bodies:<br>
+    summary = xlnet_model(body, min_length=min_length_text)<br>
+    xlnet_summaries.append(summary)<br>
+<br>
+# ==============================<br>
+# DISPLAY RESULTS<br>
+# ==============================<br>
+<br>
+print("\n\nXLNet Summarization Results:\n")<br>
+<br>
+for i in range(len(bodies)):<br>
+    print("=" * 80)<br>
+    print("ORIGINAL TEXT:")<br>
+    print(bodies[i])<br>
+<br>
+    print("\nXLNet SUMMARY:")<br>
+    print(xlnet_summaries[i])<br>
+    print("=" * 80)<br>
+<br>
+# ==============================<br>
+# TEST WITH CUSTOM TEXT<br>
+# ==============================<br>
+<br>
+custom_text = """<br>
+Artificial intelligence is transforming healthcare by improving diagnosis,<br>
+treatment planning, patient monitoring, and medical research. AI systems can<br>
+analyze large amounts of medical data quickly and help doctors make better<br>
+decisions. It is also used in drug discovery and personalized medicine.<br>
+"""<br>
+<br>
+custom_summary = xlnet_model(custom_text, min_length=30)<br>
+<br>
+print("\nCustom Text:")<br>
+print(custom_text)<br>
+<br>
+print("\nGenerated XLNet Summary:")<br>
+print(custom_summary)<br>
     </h1>
 </body>
 </html>
